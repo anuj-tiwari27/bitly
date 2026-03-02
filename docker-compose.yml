@@ -1,0 +1,403 @@
+version: '3.8'
+
+services:
+  # ===========================================
+  # API Gateway - Traefik
+  # ===========================================
+  traefik:
+    image: traefik:v2.10
+    container_name: bitly-traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--accesslog=true"
+      - "--log.level=INFO"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Traefik dashboard
+    volumes:
+      - //var/run/docker.sock:/var/run/docker.sock:ro
+      - ./infrastructure/traefik:/etc/traefik
+    networks:
+      - bitly-network
+    restart: unless-stopped
+
+  # ===========================================
+  # Databases
+  # ===========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: bitly-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bitly}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bitly_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-bitly}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - bitly-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bitly}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: bitly-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - bitly-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.8
+    container_name: bitly-clickhouse
+    environment:
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-bitly}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-bitly_secret}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-analytics}
+    ports:
+      - "8123:8123"  # HTTP interface
+      - "9000:9000"  # Native interface
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./infrastructure/clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - bitly-network
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ===========================================
+  # Message Queue - Kafka
+  # ===========================================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: bitly-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_logs:/var/lib/zookeeper/log
+    networks:
+      - bitly-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: bitly-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - bitly-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  kafka-init:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: bitly-kafka-init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "
+      echo 'Waiting for Kafka to be ready...'
+      sleep 10
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic click-events --partitions 3 --replication-factor 1
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic link-events --partitions 3 --replication-factor 1
+      echo 'Kafka topics created successfully'
+      "
+    networks:
+      - bitly-network
+
+  # ===========================================
+  # Application Services
+  # ===========================================
+  rbac-service:
+    build:
+      context: ./services/rbac-service
+      dockerfile: Dockerfile
+    container_name: bitly-rbac-service
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-bitly}:${POSTGRES_PASSWORD:-bitly_secret}@postgres:5432/${POSTGRES_DB:-bitly}
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRY_MINUTES=30
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rbac.rule=PathPrefix(`/api/auth`) || PathPrefix(`/api/users`) || PathPrefix(`/api/roles`)"
+      - "traefik.http.routers.rbac.entrypoints=web"
+      - "traefik.http.services.rbac.loadbalancer.server.port=8000"
+    networks:
+      - bitly-network
+    restart: unless-stopped
+
+  link-service:
+    build:
+      context: ./services/link-service
+      dockerfile: Dockerfile
+    container_name: bitly-link-service
+    ports:
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-bitly}:${POSTGRES_PASSWORD:-bitly_secret}@postgres:5432/${POSTGRES_DB:-bitly}
+      - REDIS_URL=redis://redis:6379/0
+      - CLICKHOUSE_HOST=clickhouse
+      - CLICKHOUSE_PORT=9000
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-bitly}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-bitly_secret}
+      - CLICKHOUSE_DB=${CLICKHOUSE_DB:-analytics}
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      - SHORT_DOMAIN=${SHORT_DOMAIN:-https://nsw-ata-underground-chancellor.trycloudflare.com/r}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.links.rule=PathPrefix(`/api/links`)"
+      - "traefik.http.routers.links.entrypoints=web"
+      - "traefik.http.services.links.loadbalancer.server.port=8000"
+    networks:
+      - bitly-network
+    restart: unless-stopped
+
+  campaign-service:
+    build:
+      context: ./services/campaign-service
+      dockerfile: Dockerfile
+    container_name: bitly-campaign-service
+    ports:
+      - "8003:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-bitly}:${POSTGRES_PASSWORD:-bitly_secret}@postgres:5432/${POSTGRES_DB:-bitly}
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.campaigns.rule=PathPrefix(`/api/campaigns`)"
+      - "traefik.http.routers.campaigns.entrypoints=web"
+      - "traefik.http.services.campaigns.loadbalancer.server.port=8000"
+    networks:
+      - bitly-network
+    restart: unless-stopped
+
+  qr-service:
+    build:
+      context: ./services/qr-service
+      dockerfile: Dockerfile
+    container_name: bitly-qr-service
+    ports:
+      - "8004:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-bitly}:${POSTGRES_PASSWORD:-bitly_secret}@postgres:5432/${POSTGRES_DB:-bitly}
+      - REDIS_URL=redis://redis:6379/0
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET:-bitly-qr-images}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qr.rule=PathPrefix(`/api/qr`)"
+      - "traefik.http.routers.qr.entrypoints=web"
+      - "traefik.http.services.qr.loadbalancer.server.port=8000"
+    networks:
+      - bitly-network
+    restart: unless-stopped
+
+  redirect-service:
+    build:
+      context: ./services/redirect-service
+      dockerfile: Dockerfile
+    container_name: bitly-redirect-service
+    ports:
+      - "8005:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-bitly}:${POSTGRES_PASSWORD:-bitly_secret}@postgres:5432/${POSTGRES_DB:-bitly}
+      - REDIS_URL=redis://redis:6379/0
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - EVENT_COLLECTOR_URL=http://event-collector:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.redirect.rule=PathPrefix(`/r/`)"
+      - "traefik.http.routers.redirect.entrypoints=web"
+      - "traefik.http.routers.redirect.priority=100"
+      - "traefik.http.services.redirect.loadbalancer.server.port=8000"
+    networks:
+      - bitly-network
+    restart: unless-stopped
+
+  event-collector:
+    build:
+      context: ./services/event-collector
+      dockerfile: Dockerfile
+    container_name: bitly-event-collector
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - KAFKA_TOPIC=click-events
+    depends_on:
+      kafka:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.events.rule=PathPrefix(`/api/events`)"
+      - "traefik.http.routers.events.entrypoints=web"
+      - "traefik.http.services.events.loadbalancer.server.port=8000"
+    networks:
+      - bitly-network
+    restart: unless-stopped
+
+  analytics-processor:
+    build:
+      context: ./services/analytics-processor
+      dockerfile: Dockerfile
+    container_name: bitly-analytics-processor
+    ports:
+      - "8006:8000"
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - KAFKA_TOPIC=click-events
+      - KAFKA_GROUP_ID=analytics-processor-group
+      - CLICKHOUSE_HOST=clickhouse
+      - CLICKHOUSE_PORT=9000
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-bitly}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-bitly_secret}
+      - CLICKHOUSE_DB=${CLICKHOUSE_DB:-analytics}
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-bitly}:${POSTGRES_PASSWORD:-bitly_secret}@postgres:5432/${POSTGRES_DB:-bitly}
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+    depends_on:
+      kafka:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.analytics.rule=PathPrefix(`/api/analytics`)"
+      - "traefik.http.routers.analytics.entrypoints=web"
+      - "traefik.http.services.analytics.loadbalancer.server.port=8000"
+    networks:
+      - bitly-network
+    restart: unless-stopped
+
+  # ===========================================
+  # Frontend
+  # ===========================================
+  frontend:
+    build:
+      context: ./frontend/web
+      dockerfile: Dockerfile
+    container_name: bitly-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - RBAC_SERVICE_URL=http://rbac-service:8000
+      - LINK_SERVICE_URL=http://link-service:8000
+      - CAMPAIGN_SERVICE_URL=http://campaign-service:8000
+      - QR_SERVICE_URL=http://qr-service:8000
+      - REDIRECT_SERVICE_URL=http://redirect-service:8000
+      - ANALYTICS_SERVICE_URL=http://analytics-processor:8000
+      - NEXT_PUBLIC_REDIRECT_URL=http://localhost:8005
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-your-nextauth-secret-change-in-production}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.priority=1"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+    networks:
+      - bitly-network
+    restart: unless-stopped
+
+networks:
+  bitly-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  clickhouse_data:
+  zookeeper_data:
+  zookeeper_logs:
+  kafka_data:

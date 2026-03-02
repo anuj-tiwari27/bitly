@@ -1,0 +1,22 @@
+# Test dependencies
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+httpx>=0.24.0
+
+# Required for mocking
+pytest-mock>=3.11.0
+
+# Async testing support
+anyio>=3.7.0
+
+# Service dependencies (needed for import)
+fastapi>=0.104.0
+sqlalchemy>=2.0.0
+pydantic>=2.0.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+qrcode[pil]>=7.4.0
+
+# E2E testing
+playwright>=1.40.0
