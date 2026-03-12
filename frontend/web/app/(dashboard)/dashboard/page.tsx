@@ -69,57 +69,62 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Welcome back! Here&apos;s your overview.</p>
+        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Welcome back! Here&apos;s your overview.
+        </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <div
             key={stat.name}
-            className="bg-white rounded-xl border p-6 hover:shadow-md transition"
+            className="rounded-xl border bg-card p-6 text-card-foreground hover:shadow-md transition"
           >
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                <stat.icon className="h-6 w-6 text-blue-600" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                <stat.icon className="h-6 w-6 text-primary" />
               </div>
               <span
                 className={`text-sm font-medium ${
-                  stat.changeType === 'positive' ? 'text-green-600' : 
-                  stat.changeType === 'negative' ? 'text-red-600' : 'text-gray-500'
+                  stat.changeType === 'positive'
+                    ? 'text-emerald-400'
+                    : stat.changeType === 'negative'
+                      ? 'text-red-400'
+                      : 'text-muted-foreground'
                 }`}
               >
                 {stat.change}
               </span>
             </div>
             <div className="mt-4">
-              <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-              <p className="text-sm text-gray-500">{stat.name}</p>
+              <p className="text-2xl font-bold">{stat.value}</p>
+              <p className="text-sm text-muted-foreground">{stat.name}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Recent Links */}
-      <div className="bg-white rounded-xl border">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Links</h2>
+      <div className="rounded-xl border bg-card">
+        <div className="flex items-center justify-between border-b border-border p-6">
+          <h2 className="text-lg font-semibold text-card-foreground">Recent Links</h2>
           <Link
             href="/dashboard/links"
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            className="text-sm font-medium text-primary hover:opacity-90"
           >
             View all
           </Link>
         </div>
-        <div className="divide-y">
+        <div className="divide-y divide-border">
           {links.length === 0 ? (
             <div className="p-8 text-center">
-              <Link2 className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No links yet</p>
+              <Link2 className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">No links yet</p>
               <Link
                 href="/dashboard/links/new"
-                className="inline-block mt-4 text-blue-600 hover:text-blue-700 font-medium"
+                className="mt-4 inline-block text-sm font-medium text-primary hover:opacity-90"
               >
                 Create your first link
               </Link>
@@ -128,28 +133,28 @@ export default function DashboardPage() {
             links.map((link: any) => (
               <div
                 key={link.id}
-                className="flex items-center justify-between p-4 hover:bg-gray-50 transition"
+                className="flex items-center justify-between p-4 transition hover:bg-muted"
               >
                 <div className="flex-1 min-w-0">
                   <Link
                     href={`/dashboard/links/${link.id}`}
-                    className="text-sm font-medium text-gray-900 hover:text-blue-600"
+                    className="text-sm font-medium text-card-foreground hover:text-primary"
                   >
                     {link.title || truncateUrl(link.destination_url, 40)}
                   </Link>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {link.short_url}
                   </p>
                 </div>
                 <div className="flex items-center space-x-6 ml-4">
                   <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-card-foreground">
                       {formatNumber(link.click_count)}
                     </p>
-                    <p className="text-xs text-gray-500">clicks</p>
+                    <p className="text-xs text-muted-foreground">clicks</p>
                   </div>
                   <div className="text-right hidden sm:block">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       {formatDate(link.created_at)}
                     </p>
                   </div>
@@ -161,38 +166,38 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Link
           href="/dashboard/links/new"
-          className="bg-blue-600 text-white rounded-xl p-6 hover:bg-blue-700 transition"
+          className="rounded-xl bg-primary p-6 text-primary-foreground transition hover:opacity-90"
         >
           <Link2 className="h-8 w-8 mb-4" />
           <h3 className="text-lg font-semibold">Create Link</h3>
-          <p className="text-blue-100 text-sm mt-1">
+          <p className="mt-1 text-sm text-primary-foreground/80">
             Shorten a new URL and track its performance
           </p>
         </Link>
         <Link
           href="/dashboard/campaigns/new"
-          className="bg-white border rounded-xl p-6 hover:shadow-md transition"
+          className="rounded-xl border bg-card p-6 text-card-foreground hover:shadow-md transition"
         >
-          <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-            <span className="text-purple-600 text-lg">📢</span>
+          <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-lg bg-secondary/10">
+            <span className="text-lg text-secondary-foreground">📢</span>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">New Campaign</h3>
-          <p className="text-gray-500 text-sm mt-1">
+          <h3 className="text-lg font-semibold">New Campaign</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
             Organize your links into campaigns
           </p>
         </Link>
         <Link
           href="/dashboard/analytics"
-          className="bg-white border rounded-xl p-6 hover:shadow-md transition"
+          className="rounded-xl border bg-card p-6 text-card-foreground hover:shadow-md transition"
         >
-          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-            <span className="text-green-600 text-lg">📊</span>
+          <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
+            <span className="text-lg text-emerald-400">📊</span>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">View Analytics</h3>
-          <p className="text-gray-500 text-sm mt-1">
+          <h3 className="text-lg font-semibold">View Analytics</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
             Deep dive into your link performance
           </p>
         </Link>

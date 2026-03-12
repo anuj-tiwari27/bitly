@@ -65,16 +65,18 @@ export default function LinksPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Links</h1>
-          <p className="text-gray-600 mt-1">Manage short links and document shares</p>
+          <h1 className="text-2xl font-bold text-foreground">Links</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Manage short links and document shares
+          </p>
         </div>
         <div className="flex gap-2">
           <Link
             href="/dashboard/links/upload-document"
             className={`flex items-center px-4 py-2 rounded-lg transition ${
               activeTab === 'documents'
-                ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                : 'border border-indigo-600 text-indigo-600 hover:bg-indigo-50'
+                ? 'bg-secondary text-secondary-foreground hover:opacity-90'
+                : 'border border-secondary text-secondary hover:bg-secondary/10'
             }`}
           >
             <FileUp className="h-4 w-4 mr-2" />
@@ -84,8 +86,8 @@ export default function LinksPage() {
             href="/dashboard/links/new"
             className={`flex items-center px-4 py-2 rounded-lg transition ${
               activeTab === 'links'
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'border border-gray-300 hover:bg-gray-50'
+                ? 'bg-primary text-primary-foreground hover:opacity-90'
+                : 'border border-border text-foreground hover:bg-muted'
             }`}
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -95,20 +97,20 @@ export default function LinksPage() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-border">
         <nav className="flex gap-8">
           <button
             onClick={() => setActiveTab('links')}
             className={`pb-4 px-1 border-b-2 font-medium text-sm transition ${
               activeTab === 'links'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted'
             }`}
           >
             <span className="flex items-center gap-2">
               <Link2 className="h-4 w-4" />
               Links
-              <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                 {urlLinks.length}
               </span>
             </span>
@@ -117,14 +119,14 @@ export default function LinksPage() {
             onClick={() => setActiveTab('documents')}
             className={`pb-4 px-1 border-b-2 font-medium text-sm transition ${
               activeTab === 'documents'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-secondary text-secondary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted'
             }`}
           >
             <span className="flex items-center gap-2">
               <FileUp className="h-4 w-4" />
               Documents
-              <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                 {documentLinks.length}
               </span>
             </span>
@@ -134,32 +136,34 @@ export default function LinksPage() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={activeTab === 'documents' ? 'Search documents...' : 'Search links...'}
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full rounded-lg border border-border bg-card pl-10 pr-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
         />
       </div>
 
       {/* Links / Documents Table */}
-      <div className="bg-white rounded-xl border overflow-hidden">
+      <div className="overflow-hidden rounded-xl border bg-card text-card-foreground">
         {isLoading ? (
           <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto" />
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
           </div>
         ) : links.length === 0 ? (
           <div className="p-12 text-center">
             {activeTab === 'documents' ? (
               <>
-                <FileUp className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No documents yet</h3>
-                <p className="text-gray-500 mb-4">Upload a document to get a short link and QR code</p>
+                <FileUp className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                <h3 className="mb-2 text-lg font-medium text-card-foreground">No documents yet</h3>
+                <p className="mb-4 text-sm text-muted-foreground">
+                  Upload a document to get a short link and QR code
+                </p>
                 <Link
                   href="/dashboard/links/upload-document"
-                  className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                  className="inline-flex items-center rounded-lg bg-secondary px-4 py-2 text-secondary-foreground transition hover:opacity-90"
                 >
                   <FileUp className="h-4 w-4 mr-2" />
                   Upload Document
@@ -167,12 +171,14 @@ export default function LinksPage() {
               </>
             ) : (
               <>
-                <Link2 className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No links yet</h3>
-                <p className="text-gray-500 mb-4">Create your first short link to get started</p>
+                <Link2 className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                <h3 className="mb-2 text-lg font-medium text-card-foreground">No links yet</h3>
+                <p className="mb-4 text-sm text-muted-foreground">
+                  Create your first short link to get started
+                </p>
                 <Link
                   href="/dashboard/links/new"
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-primary-foreground transition hover:opacity-90"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Create Link
@@ -183,76 +189,76 @@ export default function LinksPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b">
+              <thead className="border-b border-border bg-muted/40">
                 <tr>
-                  <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     {activeTab === 'documents' ? 'Document' : 'Link'}
                   </th>
-                  <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Short URL
                   </th>
-                  <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Clicks
                   </th>
-                  <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Created
                   </th>
-                  <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Status
                   </th>
                   <th className="px-6 py-4"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-border">
                 {links.map((link: any) => (
-                  <tr key={link.id} className="hover:bg-gray-50">
+                  <tr key={link.id} className="hover:bg-muted/60">
                     <td className="px-6 py-4">
                       <Link
                         href={`/dashboard/links/${link.id}`}
                         className="block"
                       >
-                        <p className="text-sm font-medium text-gray-900 hover:text-blue-600">
+                        <p className="text-sm font-medium text-card-foreground hover:text-primary">
                           {link.title || 'Untitled'}
                         </p>
-                        <p className="text-xs text-gray-500 truncate max-w-xs">
+                        <p className="max-w-xs truncate text-xs text-muted-foreground">
                           {truncateUrl(link.destination_url, 50)}
                         </p>
                       </Link>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-blue-600 font-mono">
+                        <span className="font-mono text-sm text-primary">
                           {link.short_url}
                         </span>
                         <button
                           onClick={() => handleCopy(link.short_url, link.id)}
-                          className="p-1 hover:bg-gray-100 rounded"
+                          className="rounded p-1 hover:bg-muted"
                         >
                           {copiedId === link.id ? (
-                            <Check className="h-4 w-4 text-green-600" />
+                            <Check className="h-4 w-4 text-emerald-400" />
                           ) : (
-                            <Copy className="h-4 w-4 text-gray-400" />
+                            <Copy className="h-4 w-4 text-muted-foreground" />
                           )}
                         </button>
                         <a
                           href={link.short_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1 hover:bg-gray-100 rounded"
+                          className="rounded p-1 hover:bg-muted"
                         >
-                          <ExternalLink className="h-4 w-4 text-gray-400" />
+                          <ExternalLink className="h-4 w-4 text-muted-foreground" />
                         </a>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center text-sm">
-                        <MousePointerClick className="h-4 w-4 text-gray-400 mr-1" />
+                        <MousePointerClick className="mr-1 h-4 w-4 text-muted-foreground" />
                         {formatNumber(link.click_count)}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Calendar className="h-4 w-4 mr-1" />
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Calendar className="mr-1 h-4 w-4" />
                         {formatDate(link.created_at)}
                       </div>
                     </td>
@@ -260,8 +266,8 @@ export default function LinksPage() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           link.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-emerald-500/15 text-emerald-300'
+                            : 'bg-muted text-muted-foreground'
                         }`}
                       >
                         {link.is_active ? 'Active' : 'Inactive'}
@@ -276,27 +282,27 @@ export default function LinksPage() {
                               is_active: !link.is_active,
                             })
                           }
-                          className="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-medium border hover:bg-gray-50"
+                          className="inline-flex items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium hover:bg-muted"
                           title={link.is_active ? 'Make inactive' : 'Activate link'}
                         >
                           {link.is_active ? (
                             <>
-                              <PauseCircle className="h-3 w-3 mr-1 text-gray-500" />
+                              <PauseCircle className="mr-1 h-3 w-3 text-muted-foreground" />
                               Inactivate
                             </>
                           ) : (
                             <>
-                              <PlayCircle className="h-3 w-3 mr-1 text-green-600" />
+                              <PlayCircle className="mr-1 h-3 w-3 text-emerald-400" />
                               Activate
                             </>
                           )}
                         </button>
                         <Link
                           href={`/dashboard/links/${link.id}/qr`}
-                          className="p-2 hover:bg-gray-100 rounded-lg"
+                          className="rounded-lg p-2 hover:bg-muted"
                           title="QR Code"
                         >
-                          <QrCode className="h-4 w-4 text-gray-500" />
+                          <QrCode className="h-4 w-4 text-muted-foreground" />
                         </Link>
                         <button
                           onClick={() => {
@@ -304,10 +310,10 @@ export default function LinksPage() {
                               deleteMutation.mutate(link.id)
                             }
                           }}
-                          className="p-2 hover:bg-red-50 rounded-lg"
+                          className="rounded-lg p-2 hover:bg-red-500/10"
                           title="Delete permanently"
                         >
-                          <Trash2 className="h-4 w-4 text-red-500" />
+                          <Trash2 className="h-4 w-4 text-red-400" />
                         </button>
                       </div>
                     </td>

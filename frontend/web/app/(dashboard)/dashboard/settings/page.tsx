@@ -46,38 +46,38 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your account settings</p>
+        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Manage your account settings</p>
       </div>
 
       {/* Profile Section */}
-      <div className="bg-white rounded-xl border p-6 mb-6">
+      <div className="mb-6 rounded-xl border bg-card p-6 text-card-foreground">
         <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-            <User className="h-5 w-5 text-blue-600" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+            <User className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Profile</h2>
-            <p className="text-sm text-gray-500">Update your personal information</p>
+            <h2 className="text-lg font-semibold">Profile</h2>
+            <p className="text-sm text-muted-foreground">Update your personal information</p>
           </div>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
               Email
             </label>
             <input
               type="email"
               value={user?.email || ''}
               disabled
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+              className="w-full rounded-lg border border-border bg-muted px-4 py-3 text-muted-foreground"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 First Name
               </label>
               <input
@@ -85,11 +85,11 @@ export default function SettingsPage() {
                 name="first_name"
                 value={formData.first_name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 Last Name
               </label>
               <input
@@ -97,7 +97,7 @@ export default function SettingsPage() {
                 name="last_name"
                 value={formData.last_name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function SettingsPage() {
           <div className="flex justify-end pt-4">
             <button
               onClick={handleSave}
-              className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="flex items-center rounded-lg bg-primary px-6 py-3 text-primary-foreground transition hover:opacity-90"
             >
               {saved ? (
                 <>Saved!</>
@@ -121,11 +121,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Account Info */}
-      <div className="bg-white rounded-xl border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h2>
+      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <h2 className="mb-4 text-lg font-semibold">Account Information</h2>
         <dl className="space-y-4">
           <div className="flex justify-between">
-            <dt className="text-sm text-gray-500">Account Status</dt>
+            <dt className="text-sm text-muted-foreground">Account Status</dt>
             <dd>
               <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
                 user?.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -135,7 +135,7 @@ export default function SettingsPage() {
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-sm text-gray-500">Email Verified</dt>
+            <dt className="text-sm text-muted-foreground">Email Verified</dt>
             <dd>
               <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
                 user?.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
@@ -145,14 +145,14 @@ export default function SettingsPage() {
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-sm text-gray-500">Roles</dt>
-            <dd className="text-sm text-gray-900">
+            <dt className="text-sm text-muted-foreground">Roles</dt>
+            <dd className="text-sm text-card-foreground">
               {user?.roles?.join(', ') || 'No roles'}
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-sm text-gray-500">Member Since</dt>
-            <dd className="text-sm text-gray-900">
+            <dt className="text-sm text-muted-foreground">Member Since</dt>
+            <dd className="text-sm text-card-foreground">
               {user?.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}
             </dd>
           </div>
@@ -244,24 +244,26 @@ function OrganizationSettingsSection({ queryClient }: { queryClient: ReturnType<
   }
 
   return (
-    <div className="bg-white rounded-xl border p-6 mb-6">
+    <div className="mb-6 rounded-xl border bg-card p-6 text-card-foreground">
       <div className="flex items-center space-x-3 mb-6">
-        <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-          <Building2 className="h-5 w-5 text-amber-600" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
+          <Building2 className="h-5 w-5 text-amber-400" />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Organization</h2>
-          <p className="text-sm text-gray-500">Edit your organization details</p>
+          <h2 className="text-lg font-semibold">Organization</h2>
+          <p className="text-sm text-muted-foreground">Edit your organization details</p>
         </div>
       </div>
       <div className="space-y-4">
         {orgs && orgs.length > 1 && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Organization</label>
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
+              Organization
+            </label>
             <select
               value={orgId}
               onChange={handleOrgSwitch}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary"
             >
               {orgs.map((o: any) => (
                 <option key={o.id} value={o.id}>{o.name}</option>
@@ -270,56 +272,66 @@ function OrganizationSettingsSection({ queryClient }: { queryClient: ReturnType<
           </div>
         )}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <label className="mb-1 block text-sm font-medium text-muted-foreground">
+            Name
+          </label>
           <input
             type="text"
             name="name"
             value={form.name}
             onChange={handleOrgChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+          <label className="mb-1 block text-sm font-medium text-muted-foreground">
+            Slug
+          </label>
           <input
             type="text"
             name="slug"
             value={form.slug}
             onChange={handleOrgChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+          <label className="mb-1 block text-sm font-medium text-muted-foreground">
+            Website
+          </label>
           <input
             type="text"
             name="website"
             value={form.website}
             onChange={handleOrgChange}
             placeholder="https://example.com"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
+              Industry
+            </label>
             <input
               type="text"
               name="industry"
               value={form.industry}
               onChange={handleOrgChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Team size</label>
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
+              Team size
+            </label>
             <input
               type="text"
               name="team_size"
               value={form.team_size}
               onChange={handleOrgChange}
               placeholder="e.g. 1-10"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
         </div>
@@ -327,7 +339,7 @@ function OrganizationSettingsSection({ queryClient }: { queryClient: ReturnType<
           <button
             onClick={handleOrgSave}
             disabled={updateMutation.isPending}
-            className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+            className="flex items-center rounded-lg bg-primary px-6 py-3 text-primary-foreground transition disabled:opacity-50 hover:opacity-90"
           >
             {updateMutation.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -371,24 +383,26 @@ function AdminRoleSettingsSection({ queryClient }: { queryClient: ReturnType<typ
   const roles = Array.isArray(rolesData) ? rolesData : (rolesData as any)?.data || []
 
   return (
-    <div className="bg-white rounded-xl border p-6">
+    <div className="rounded-xl border bg-card p-6 text-card-foreground">
       <div className="flex items-center space-x-3 mb-6">
-        <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-          <Shield className="h-5 w-5 text-slate-600" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800">
+          <Shield className="h-5 w-5 text-slate-200" />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Admin & Moderators</h2>
-          <p className="text-sm text-gray-500">Assign platform roles to users</p>
+          <h2 className="text-lg font-semibold">Admin & Moderators</h2>
+          <p className="text-sm text-muted-foreground">Assign platform roles to users</p>
         </div>
       </div>
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">User</label>
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
+              User
+            </label>
             <select
               value={selectedUserId}
               onChange={(e) => setSelectedUserId(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary"
             >
               <option value="">Select user</option>
               {users.map((u: any) => (
@@ -399,11 +413,13 @@ function AdminRoleSettingsSection({ queryClient }: { queryClient: ReturnType<typ
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
+              Role
+            </label>
             <select
               value={selectedRoleId}
               onChange={(e) => setSelectedRoleId(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary"
             >
               <option value="">Select role</option>
               {roles.map((r: any) => (
@@ -417,13 +433,13 @@ function AdminRoleSettingsSection({ queryClient }: { queryClient: ReturnType<typ
             <button
               onClick={() => assignMutation.mutate()}
               disabled={!selectedUserId || !selectedRoleId || assignMutation.isPending}
-              className="w-full px-4 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50"
+              className="w-full rounded-lg bg-secondary px-4 py-3 text-secondary-foreground hover:opacity-90 disabled:opacity-50"
             >
               {assignMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : 'Assign role'}
             </button>
           </div>
         </div>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           To remove a role, contact a developer or use the database. Assigned roles grant access to admin or moderator features.
         </p>
       </div>

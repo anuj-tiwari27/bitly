@@ -60,8 +60,8 @@ export default function DashboardLayout({
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     )
   }
@@ -70,8 +70,8 @@ export default function DashboardLayout({
   if (pathname.startsWith('/dashboard/admin') && !isAdmin) {
     router.replace('/dashboard')
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     )
   }
@@ -113,7 +113,7 @@ export default function DashboardLayout({
             </Link>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 rounded-md hover:bg-gray-100"
+              className="lg:hidden p-2 rounded-md text-slate-300 hover:bg-slate-800"
             >
               <X className="h-5 w-5" />
             </button>
@@ -142,23 +142,23 @@ export default function DashboardLayout({
           </nav>
 
           {/* User section */}
-          <div className="p-4 border-t">
+          <div className="p-4 border-t border-slate-800">
             <div className="flex items-center space-x-3 mb-3">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <span className="text-blue-600 font-medium">
+              <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center">
+                <span className="text-primary font-medium">
                   {user.first_name?.[0] || user.email[0].toUpperCase()}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.email}
                 </p>
-                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                <p className="text-xs text-slate-400 truncate">{user.email}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center w-full px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition"
+              className="flex items-center w-full px-4 py-2 text-slate-300 hover:bg-slate-800 rounded-lg transition"
             >
               <LogOut className="h-5 w-5 mr-3" />
               Sign out
@@ -170,18 +170,18 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-white border-b">
-          <div className="flex items-center justify-between h-16 px-4 lg:px-8">
+        <header className="sticky top-0 z-30 border-b border-slate-800 bg-slate-950/95 backdrop-blur">
+          <div className="flex items-center justify-between h-16 px-4 lg:px-8 text-foreground">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-md hover:bg-gray-100"
+              className="lg:hidden p-2 rounded-md hover:bg-slate-800"
             >
               <Menu className="h-6 w-6" />
             </button>
             <div className="flex-1" />
             <Link
               href="/dashboard/links/new"
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="flex items-center px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition"
             >
               <Link2 className="h-4 w-4 mr-2" />
               Create Link
