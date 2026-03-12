@@ -136,14 +136,17 @@ export default function QRCodePage() {
         <div className="bg-white rounded-xl border p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">QR Code Preview</h2>
           
-          <div 
-            className="flex items-center justify-center p-8 rounded-lg mb-6"
-            style={{ backgroundColor: styleConfig.back_color }}
+          <div
+            className="flex items-center justify-center rounded-lg mb-6"
+            style={{
+              backgroundColor: styleConfig.back_color,
+              padding: styleConfig.border * 4,
+            }}
           >
             <QRCodeSVG
               id="qr-preview"
               value={link.short_url}
-              size={200}
+              size={styleConfig.box_size * 25}
               fgColor={styleConfig.fill_color}
               bgColor={styleConfig.back_color}
               level="M"

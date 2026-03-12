@@ -80,7 +80,7 @@ export default function DashboardLayout({
     : baseNavigation
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-950 text-foreground">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -91,16 +91,25 @@ export default function DashboardLayout({
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-950 border-r border-slate-800 transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="h-full flex flex-col">
           {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-6 border-b">
+          <div className="flex items-center justify-between h-16 px-6 border-b border-slate-800">
             <Link href="/dashboard" className="flex items-center space-x-2">
-              <Link2 className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">Bitly</span>
+              <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <span className="text-xs font-semibold text-white">tl</span>
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="text-sm font-semibold text-white">
+                  thelittleurl.com
+                </span>
+                <span className="text-[11px] text-slate-400">
+                  Pixel transformation for links.
+                </span>
+              </div>
             </Link>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -119,10 +128,10 @@ export default function DashboardLayout({
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center px-4 py-3 rounded-lg transition ${
+                  className={`flex items-center px-4 py-3 rounded-lg text-sm transition ${
                     isActive
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-gray-600 hover:bg-gray-50'
+                      ? 'bg-slate-900 text-primary'
+                      : 'text-slate-300 hover:bg-slate-900/60'
                   }`}
                 >
                   <item.icon className="h-5 w-5 mr-3" />
