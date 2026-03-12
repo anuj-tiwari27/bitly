@@ -79,16 +79,19 @@ export default function LinkDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
       </div>
     )
   }
 
   if (!link) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">Link not found</p>
-        <Link href="/dashboard/links" className="text-blue-600 hover:underline mt-2 inline-block">
+      <div className="py-12 text-center">
+        <p className="text-sm text-muted-foreground">Link not found</p>
+        <Link
+          href="/dashboard/links"
+          className="mt-2 inline-block text-sm font-medium text-primary hover:underline"
+        >
           Back to links
         </Link>
       </div>
@@ -102,19 +105,21 @@ export default function LinkDetailPage() {
         <div>
           <Link
             href="/dashboard/links"
-            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-2"
+            className="mb-2 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft className="h-4 w-4 mr-1" />
+            <ArrowLeft className="mr-1 h-4 w-4" />
             Back to Links
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">{link.title || 'Untitled Link'}</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {link.title || 'Untitled Link'}
+          </h1>
         </div>
         <div className="flex items-center space-x-3">
           <Link
             href={`/dashboard/links/${linkId}/qr`}
-            className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+            className="flex items-center rounded-lg border border-border px-4 py-2 text-sm hover:bg-muted"
           >
-            <QrCode className="h-4 w-4 mr-2" />
+            <QrCode className="mr-2 h-4 w-4" />
             QR Code
           </Link>
           <button
@@ -123,58 +128,58 @@ export default function LinkDetailPage() {
                 deleteMutation.mutate()
               }
             }}
-            className="flex items-center px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition"
+            className="flex items-center rounded-lg border border-red-500/40 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
+            <Trash2 className="mr-2 h-4 w-4" />
             Delete
           </button>
         </div>
       </div>
 
       {/* Link URL Card */}
-      <div className="bg-white rounded-xl border p-6">
+      <div className="rounded-xl border bg-card p-6 text-card-foreground">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <p className="text-sm text-gray-500 mb-1">Short URL</p>
+            <p className="mb-1 text-sm text-muted-foreground">Short URL</p>
             <div className="flex items-center space-x-3">
-              <span className="text-xl font-mono text-blue-600">{link.short_url}</span>
+              <span className="text-xl font-mono text-primary">{link.short_url}</span>
               <button
                 onClick={handleCopy}
-                className="p-2 hover:bg-gray-100 rounded-lg transition"
+                className="rounded-lg p-2 transition hover:bg-muted"
               >
                 {copied ? (
-                  <Check className="h-5 w-5 text-green-600" />
+                  <Check className="h-5 w-5 text-emerald-400" />
                 ) : (
-                  <Copy className="h-5 w-5 text-gray-400" />
+                  <Copy className="h-5 w-5 text-muted-foreground" />
                 )}
               </button>
               <a
                 href={link.short_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 hover:bg-gray-100 rounded-lg transition"
+                className="rounded-lg p-2 transition hover:bg-muted"
               >
-                <ExternalLink className="h-5 w-5 text-gray-400" />
+                <ExternalLink className="h-5 w-5 text-muted-foreground" />
               </a>
             </div>
           </div>
           <span
             className={`px-3 py-1 rounded-full text-sm font-medium ${
               link.is_active
-                ? 'bg-green-100 text-green-800'
-                : 'bg-gray-100 text-gray-800'
+                ? 'bg-emerald-500/15 text-emerald-300'
+                : 'bg-muted text-muted-foreground'
             }`}
           >
             {link.is_active ? 'Active' : 'Inactive'}
           </span>
         </div>
-        <div className="mt-4 pt-4 border-t">
-          <p className="text-sm text-gray-500 mb-1">Destination</p>
+        <div className="mt-4 border-t border-border pt-4">
+          <p className="mb-1 text-sm text-muted-foreground">Destination</p>
           <a
             href={link.destination_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gray-900 hover:text-blue-600 break-all"
+            className="break-all text-card-foreground hover:text-primary"
           >
             {link.destination_url}
           </a>
@@ -183,16 +188,16 @@ export default function LinkDetailPage() {
 
       {/* Date Range Selector */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Link Analytics</h2>
-        <div className="flex items-center gap-2 bg-white rounded-lg border p-1">
+        <h2 className="text-lg font-semibold text-foreground">Link Analytics</h2>
+        <div className="flex items-center gap-2 rounded-lg border bg-card p-1 text-card-foreground">
           {[7, 14, 30, 90].map((d) => (
             <button
               key={d}
               onClick={() => setDays(d)}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 days === d
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               {d} Days
@@ -202,77 +207,77 @@ export default function LinkDetailPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-white rounded-xl border p-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+        <div className="rounded-xl border bg-card p-4 text-card-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-              <MousePointerClick className="h-5 w-5 text-blue-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <MousePointerClick className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold">
                 {formatNumber(analytics.overview?.total_clicks || link.click_count)}
               </p>
-              <p className="text-xs text-gray-500">Total Clicks</p>
+              <p className="text-xs text-muted-foreground">Total Clicks</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="rounded-xl border bg-card p-4 text-card-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-              <Users className="h-5 w-5 text-green-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+              <Users className="h-5 w-5 text-emerald-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold">
                 {formatNumber(analytics.overview?.unique_visitors || 0)}
               </p>
-              <p className="text-xs text-gray-500">Unique Visitors</p>
+              <p className="text-xs text-muted-foreground">Unique Visitors</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="rounded-xl border bg-card p-4 text-card-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-orange-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
+              <TrendingUp className="h-5 w-5 text-amber-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold">
                 {formatNumber(analytics.overview?.clicks_today || 0)}
               </p>
-              <p className="text-xs text-gray-500">Today</p>
+              <p className="text-xs text-muted-foreground">Today</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="rounded-xl border bg-card p-4 text-card-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-purple-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/10">
+              <Calendar className="h-5 w-5 text-secondary" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold">
                 {formatNumber(analytics.overview?.clicks_this_week || 0)}
               </p>
-              <p className="text-xs text-gray-500">This Week</p>
+              <p className="text-xs text-muted-foreground">This Week</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="rounded-xl border bg-card p-4 text-card-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-pink-50 rounded-lg flex items-center justify-center">
-              <Clock className="h-5 w-5 text-pink-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-fuchsia-500/10">
+              <Clock className="h-5 w-5 text-fuchsia-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold">
                 {formatNumber(analytics.overview?.clicks_this_month || 0)}
               </p>
-              <p className="text-xs text-gray-500">This Month</p>
+              <p className="text-xs text-muted-foreground">This Month</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Clicks Over Time Chart */}
-      <div className="bg-white rounded-xl border p-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Clicks Over Time</h3>
+      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <h3 className="mb-4 font-semibold">Clicks Over Time</h3>
         <div className="h-64">
           {analytics.clicks_over_time?.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
@@ -318,7 +323,7 @@ export default function LinkDetailPage() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-full flex items-center justify-center text-gray-500">
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
               No click data yet
             </div>
           )}
@@ -326,10 +331,10 @@ export default function LinkDetailPage() {
       </div>
 
       {/* Device & Browser Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Devices */}
-        <div className="bg-white rounded-xl border p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Devices</h3>
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <h3 className="mb-4 font-semibold">Devices</h3>
           {analytics.devices?.length > 0 ? (
             <div className="flex items-center">
               <div className="w-1/2">
@@ -360,12 +365,14 @@ export default function LinkDetailPage() {
                   return (
                     <div key={device.device_type} className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <div 
-                          className="w-2 h-2 rounded-full mr-2"
+                        <div
+                          className="mr-2 h-2 w-2 rounded-full"
                           style={{ backgroundColor: COLORS[index % COLORS.length] }}
                         />
-                        <Icon className="h-4 w-4 text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-600 capitalize">{device.device_type}</span>
+                        <Icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm capitalize text-card-foreground">
+                          {device.device_type}
+                        </span>
                       </div>
                       <span className="text-sm font-medium">{percentage}%</span>
                     </div>
@@ -374,13 +381,15 @@ export default function LinkDetailPage() {
               </div>
             </div>
           ) : (
-            <div className="h-32 flex items-center justify-center text-gray-500 text-sm">No data</div>
+            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+              No data
+            </div>
           )}
         </div>
 
         {/* Browsers */}
-        <div className="bg-white rounded-xl border p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Browsers</h3>
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <h3 className="mb-4 font-semibold">Browsers</h3>
           {analytics.browsers?.length > 0 ? (
             <div className="h-40">
               <ResponsiveContainer width="100%" height="100%">
@@ -400,18 +409,20 @@ export default function LinkDetailPage() {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="h-32 flex items-center justify-center text-gray-500 text-sm">No data</div>
+            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+              No data
+            </div>
           )}
         </div>
       </div>
 
       {/* Countries & Referrers Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Countries */}
-        <div className="bg-white rounded-xl border p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Globe className="h-5 w-5 text-gray-500" />
-            <h3 className="font-semibold text-gray-900">Top Countries</h3>
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <div className="mb-4 flex items-center gap-2">
+            <Globe className="h-5 w-5 text-muted-foreground" />
+            <h3 className="font-semibold">Top Countries</h3>
           </div>
           {analytics.countries?.length > 0 ? (
             <div className="space-y-3">
@@ -422,29 +433,35 @@ export default function LinkDetailPage() {
                   <div key={country.country_code} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{getFlagEmoji(country.country_code)}</span>
-                      <span className="text-sm text-gray-700">{country.country_name}</span>
+                      <span className="text-sm text-card-foreground">
+                        {country.country_name}
+                      </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-20 bg-gray-100 rounded-full h-2">
-                        <div 
-                          className="h-2 rounded-full bg-blue-500"
+                      <div className="h-2 w-20 rounded-full bg-muted">
+                        <div
+                          className="h-2 rounded-full bg-primary"
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
-                      <span className="text-sm font-medium w-12 text-right">{formatNumber(country.clicks)}</span>
+                      <span className="w-12 text-right text-sm font-medium">
+                        {formatNumber(country.clicks)}
+                      </span>
                     </div>
                   </div>
                 )
               })}
             </div>
           ) : (
-            <div className="h-32 flex items-center justify-center text-gray-500 text-sm">No geographic data yet</div>
+            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+              No geographic data yet
+            </div>
           )}
         </div>
 
         {/* Referrers */}
-        <div className="bg-white rounded-xl border p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Top Referrers</h3>
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <h3 className="mb-4 font-semibold">Top Referrers</h3>
           {analytics.referrers?.length > 0 ? (
             <div className="space-y-3">
               {analytics.referrers.slice(0, 6).map((referrer: any) => {
@@ -452,45 +469,56 @@ export default function LinkDetailPage() {
                 const percentage = total > 0 ? (referrer.clicks / total) * 100 : 0
                 return (
                   <div key={referrer.referrer} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700 truncate max-w-[150px]">{referrer.referrer}</span>
+                    <span className="max-w-[150px] truncate text-sm text-muted-foreground">
+                      {referrer.referrer}
+                    </span>
                     <div className="flex items-center gap-3">
-                      <div className="w-20 bg-gray-100 rounded-full h-2">
-                        <div 
-                          className="h-2 rounded-full bg-green-500"
+                      <div className="h-2 w-20 rounded-full bg-muted">
+                        <div
+                          className="h-2 rounded-full bg-emerald-400"
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
-                      <span className="text-sm font-medium w-12 text-right">{formatNumber(referrer.clicks)}</span>
+                      <span className="w-12 text-right text-sm font-medium">
+                        {formatNumber(referrer.clicks)}
+                      </span>
                     </div>
                   </div>
                 )
               })}
             </div>
           ) : (
-            <div className="h-32 flex items-center justify-center text-gray-500 text-sm">No referrer data yet</div>
+            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+              No referrer data yet
+            </div>
           )}
         </div>
       </div>
 
       {/* UTM Sources */}
       {analytics.utm_sources?.length > 0 && (
-        <div className="bg-white rounded-xl border p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">UTM Sources</h3>
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <h3 className="mb-4 font-semibold">UTM Sources</h3>
           <div className="space-y-3">
             {analytics.utm_sources.slice(0, 6).map((source: any) => {
-              const total = analytics.utm_sources.reduce((sum: number, s: any) => sum + s.clicks, 0)
+              const total = analytics.utm_sources.reduce(
+                (sum: number, s: any) => sum + s.clicks,
+                0,
+              )
               const percentage = total > 0 ? (source.clicks / total) * 100 : 0
               return (
                 <div key={source.source} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">{source.source}</span>
+                  <span className="text-sm text-muted-foreground">{source.source}</span>
                   <div className="flex items-center gap-3">
-                    <div className="w-32 bg-gray-100 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full bg-purple-500"
+                    <div className="h-2 w-32 rounded-full bg-muted">
+                      <div
+                        className="h-2 rounded-full bg-secondary"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
-                    <span className="text-sm font-medium w-12 text-right">{formatNumber(source.clicks)}</span>
+                    <span className="w-12 text-right text-sm font-medium">
+                      {formatNumber(source.clicks)}
+                    </span>
                   </div>
                 </div>
               )
@@ -500,35 +528,35 @@ export default function LinkDetailPage() {
       )}
 
       {/* Link Details */}
-      <div className="bg-white rounded-xl border p-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Link Details</h3>
-        <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <h3 className="mb-4 font-semibold">Link Details</h3>
+        <dl className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <dt className="text-sm text-gray-500">Created</dt>
-            <dd className="text-gray-900">{formatDate(link.created_at)}</dd>
+            <dt className="text-sm text-muted-foreground">Created</dt>
+            <dd className="text-card-foreground">{formatDate(link.created_at)}</dd>
           </div>
           {link.description && (
             <div>
-              <dt className="text-sm text-gray-500">Description</dt>
-              <dd className="text-gray-900">{link.description}</dd>
+              <dt className="text-sm text-muted-foreground">Description</dt>
+              <dd className="text-card-foreground">{link.description}</dd>
             </div>
           )}
           {link.expires_at && (
             <div>
-              <dt className="text-sm text-gray-500">Expires</dt>
-              <dd className="text-gray-900">{formatDate(link.expires_at)}</dd>
+              <dt className="text-sm text-muted-foreground">Expires</dt>
+              <dd className="text-card-foreground">{formatDate(link.expires_at)}</dd>
             </div>
           )}
           {link.max_clicks && (
             <div>
-              <dt className="text-sm text-gray-500">Max Clicks</dt>
-              <dd className="text-gray-900">{link.max_clicks}</dd>
+              <dt className="text-sm text-muted-foreground">Max Clicks</dt>
+              <dd className="text-card-foreground">{link.max_clicks}</dd>
             </div>
           )}
           {link.has_password && (
             <div>
-              <dt className="text-sm text-gray-500">Password Protected</dt>
-              <dd className="text-green-600">Yes</dd>
+              <dt className="text-sm text-muted-foreground">Password Protected</dt>
+              <dd className="text-emerald-400">Yes</dd>
             </div>
           )}
         </dl>

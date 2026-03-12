@@ -142,25 +142,25 @@ export default function UploadDocumentPage() {
   const shortUrl = result?.link?.short_url || ''
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="mx-auto max-w-2xl">
       <div className="mb-6">
         <Link
           href="/dashboard/links"
-          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4 mr-1" />
+          <ArrowLeft className="mr-1 h-4 w-4" />
           Back to Links
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl border p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-            <FileUp className="h-5 w-5 text-indigo-600" />
+      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="mb-6 flex items-center space-x-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/10">
+            <FileUp className="h-5 w-5 text-secondary" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">Upload Document</h1>
-            <p className="text-sm text-gray-500">
+            <h1 className="text-xl font-semibold">Upload Document</h1>
+            <p className="text-sm text-muted-foreground">
               Upload a file and get a short link + QR code to share it
             </p>
           </div>
@@ -169,20 +169,22 @@ export default function UploadDocumentPage() {
         {!result ? (
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">{error}</div>
+              <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-300">
+                {error}
+              </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="mb-2 block text-sm font-medium text-muted-foreground">
                 Document <span className="text-red-500">*</span>
               </label>
               <div
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition ${
+                className={`rounded-lg border-2 border-dashed p-8 text-center transition ${
                   file
-                    ? 'border-indigo-300 bg-indigo-50/50'
-                    : 'border-gray-300 hover:border-gray-400'
+                    ? 'border-secondary/60 bg-secondary/5'
+                    : 'border-border hover:border-muted'
                 }`}
               >
                 <input
@@ -195,20 +197,22 @@ export default function UploadDocumentPage() {
                 <label htmlFor="file-upload" className="cursor-pointer">
                   {file ? (
                     <div>
-                      <FileUp className="h-12 w-12 text-indigo-600 mx-auto mb-2" />
-                      <p className="font-medium text-gray-900">{file.name}</p>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <FileUp className="mx-auto mb-2 h-12 w-12 text-secondary" />
+                      <p className="font-medium text-card-foreground">{file.name}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
                         {(file.size / 1024).toFixed(1)} KB
                       </p>
-                      <p className="text-xs text-indigo-600 mt-2">Click to change file</p>
+                      <p className="mt-2 text-xs text-secondary">
+                        Click to change file
+                      </p>
                     </div>
                   ) : (
                     <div>
-                      <FileUp className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                      <p className="text-gray-600">
+                      <FileUp className="mx-auto mb-2 h-12 w-12 text-muted-foreground" />
+                      <p className="text-muted-foreground">
                         Drag and drop a file here, or click to browse
                       </p>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="mt-2 text-xs text-muted-foreground">
                         PDF, Word, Excel, images, and more. Max {MAX_SIZE_MB}MB.
                       </p>
                     </div>
@@ -218,7 +222,7 @@ export default function UploadDocumentPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 Link Title (optional)
               </label>
               <input
@@ -226,30 +230,30 @@ export default function UploadDocumentPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="My document"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-secondary"
               />
             </div>
 
             <div className="flex justify-end space-x-4 pt-4">
               <Link
                 href="/dashboard/links"
-                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                className="rounded-lg border border-border px-6 py-3 text-sm hover:bg-muted"
               >
                 Cancel
               </Link>
               <button
                 type="submit"
                 disabled={uploadMutation.isPending || !file}
-                className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                className="flex items-center rounded-lg bg-secondary px-6 py-3 text-sm text-secondary-foreground transition disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-90"
               >
                 {uploadMutation.isPending ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Creating...
                   </>
                 ) : (
                   <>
-                    <Link2 className="h-4 w-4 mr-2" />
+                    <Link2 className="mr-2 h-4 w-4" />
                     Create Link & QR
                   </>
                 )}
@@ -258,20 +262,20 @@ export default function UploadDocumentPage() {
           </form>
         ) : (
           <div className="space-y-6">
-            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <Check className="h-5 w-5 text-green-600" />
+            <div className="flex items-center gap-3 rounded-lg bg-emerald-500/10 p-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
+                <Check className="h-5 w-5 text-emerald-300" />
               </div>
               <div>
-                <p className="font-medium text-green-800">Link and QR created!</p>
-                <p className="text-sm text-green-700">
+                <p className="font-medium text-emerald-200">Link and QR created!</p>
+                <p className="text-sm text-emerald-100">
                   Your document is ready to share.
                 </p>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="mb-2 block text-sm font-medium text-muted-foreground">
                 Short Link
               </label>
               <div className="flex gap-2">
@@ -279,11 +283,11 @@ export default function UploadDocumentPage() {
                   type="text"
                   readOnly
                   value={shortUrl}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 font-mono text-sm"
+                  className="flex-1 rounded-lg border border-border bg-muted px-4 py-3 font-mono text-sm text-foreground"
                 />
                 <button
                   onClick={copyShortUrl}
-                  className="px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"
+                  className="flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-foreground hover:opacity-90"
                 >
                   {copied ? (
                     <>
@@ -302,14 +306,14 @@ export default function UploadDocumentPage() {
 
             {result.qr?.download_url && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-muted-foreground">
                   QR Code
                 </label>
                 <a
                   href={result.qr.download_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                  className="inline-flex items-center gap-2 rounded-lg bg-muted px-4 py-3 text-sm hover:bg-muted/80"
                 >
                   <Download className="h-4 w-4" />
                   Download QR Code
@@ -320,7 +324,7 @@ export default function UploadDocumentPage() {
             <div className="flex gap-4 pt-4">
               <Link
                 href={`/dashboard/links/${result.link.id}`}
-                className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                className="rounded-lg bg-primary px-6 py-3 text-sm text-primary-foreground transition hover:opacity-90"
               >
                 View Link Details
               </Link>
@@ -330,7 +334,7 @@ export default function UploadDocumentPage() {
                   setFile(null)
                   setTitle('')
                 }}
-                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                className="rounded-lg border border-border px-6 py-3 text-sm hover:bg-muted"
               >
                 Upload Another
               </button>

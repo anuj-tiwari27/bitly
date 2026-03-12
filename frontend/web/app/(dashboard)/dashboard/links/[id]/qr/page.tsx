@@ -103,16 +103,19 @@ export default function QRCodePage() {
   if (linkLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
       </div>
     )
   }
 
   if (!link) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">Link not found</p>
-        <Link href="/dashboard/links" className="text-blue-600 hover:underline mt-2 inline-block">
+      <div className="py-12 text-center">
+        <p className="text-sm text-muted-foreground">Link not found</p>
+        <Link
+          href="/dashboard/links"
+          className="mt-2 inline-block text-sm font-medium text-primary hover:underline"
+        >
           Back to links
         </Link>
       </div>
@@ -120,24 +123,24 @@ export default function QRCodePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto max-w-4xl">
       <div className="mb-6">
         <Link
           href={`/dashboard/links/${linkId}`}
-          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4 mr-1" />
+          <ArrowLeft className="mr-1 h-4 w-4" />
           Back to Link
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Preview */}
-        <div className="bg-white rounded-xl border p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">QR Code Preview</h2>
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <h2 className="mb-4 text-lg font-semibold">QR Code Preview</h2>
           
           <div
-            className="flex items-center justify-center rounded-lg mb-6"
+            className="mb-6 flex items-center justify-center rounded-lg"
             style={{
               backgroundColor: styleConfig.back_color,
               padding: styleConfig.border * 4,
@@ -154,14 +157,14 @@ export default function QRCodePage() {
             />
           </div>
 
-          <div className="text-center text-sm text-gray-500 mb-6">
+          <div className="mb-6 text-center text-sm text-muted-foreground">
             {link.short_url}
           </div>
 
           <div className="flex space-x-3">
             <button
               onClick={handleDownload}
-              className="flex-1 flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="flex flex-1 items-center justify-center rounded-lg bg-primary px-4 py-3 text-primary-foreground transition hover:opacity-90"
             >
               <Download className="h-4 w-4 mr-2" />
               Download PNG
@@ -169,7 +172,7 @@ export default function QRCodePage() {
             <button
               onClick={handleGenerate}
               disabled={generating}
-              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+              className="flex items-center justify-center rounded-lg border border-border px-4 py-3 transition hover:bg-muted disabled:opacity-50"
             >
               {generating ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -181,15 +184,15 @@ export default function QRCodePage() {
         </div>
 
         {/* Customization */}
-        <div className="bg-white rounded-xl border p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            <Palette className="h-5 w-5 inline mr-2" />
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <h2 className="mb-4 text-lg font-semibold">
+            <Palette className="mr-2 inline h-5 w-5" />
             Customize
           </h2>
 
           {/* Color Presets */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="mb-3 block text-sm font-medium text-muted-foreground">
               Color Presets
             </label>
             <div className="grid grid-cols-3 gap-3">
@@ -201,14 +204,14 @@ export default function QRCodePage() {
                     fill_color: preset.fill,
                     back_color: preset.back,
                   })}
-                  className={`relative p-3 rounded-lg border-2 transition ${
+                  className={`relative rounded-lg border-2 p-3 transition ${
                     styleConfig.fill_color === preset.fill && styleConfig.back_color === preset.back
-                      ? 'border-blue-500'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary'
+                      : 'border-border hover:border-muted'
                   }`}
                 >
-                  <div 
-                    className="w-full h-8 rounded flex items-center justify-center"
+                  <div
+                    className="flex h-8 w-full items-center justify-center rounded"
                     style={{ backgroundColor: preset.back }}
                   >
                     <div 
@@ -216,9 +219,11 @@ export default function QRCodePage() {
                       style={{ backgroundColor: preset.fill }}
                     />
                   </div>
-                  <span className="text-xs text-gray-600 mt-1 block">{preset.name}</span>
+                  <span className="mt-1 block text-xs text-muted-foreground">
+                    {preset.name}
+                  </span>
                   {styleConfig.fill_color === preset.fill && styleConfig.back_color === preset.back && (
-                    <Check className="absolute top-1 right-1 h-4 w-4 text-blue-500" />
+                    <Check className="absolute right-1 top-1 h-4 w-4 text-primary" />
                   )}
                 </button>
               ))}
@@ -226,9 +231,9 @@ export default function QRCodePage() {
           </div>
 
           {/* Custom Colors */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="mb-6 grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 Foreground Color
               </label>
               <div className="flex items-center space-x-2">
@@ -242,12 +247,12 @@ export default function QRCodePage() {
                   type="text"
                   value={styleConfig.fill_color}
                   onChange={(e) => setStyleConfig({ ...styleConfig, fill_color: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono"
+                  className="flex-1 rounded-lg border border-border px-3 py-2 text-sm font-mono bg-card text-foreground"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 Background Color
               </label>
               <div className="flex items-center space-x-2">
@@ -261,7 +266,7 @@ export default function QRCodePage() {
                   type="text"
                   value={styleConfig.back_color}
                   onChange={(e) => setStyleConfig({ ...styleConfig, back_color: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono"
+                  className="flex-1 rounded-lg border border-border px-3 py-2 text-sm font-mono bg-card text-foreground"
                 />
               </div>
             </div>
@@ -269,7 +274,7 @@ export default function QRCodePage() {
 
           {/* Size */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
               Size: {styleConfig.box_size * 25}px
             </label>
             <input
@@ -284,7 +289,7 @@ export default function QRCodePage() {
 
           {/* Border */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
               Border: {styleConfig.border}
             </label>
             <input
@@ -301,22 +306,22 @@ export default function QRCodePage() {
 
       {/* Existing QR Codes */}
       {qrCodes.length > 0 && (
-        <div className="mt-6 bg-white rounded-xl border p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Saved QR Codes</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="mt-6 rounded-xl border bg-card p-6 text-card-foreground">
+          <h2 className="mb-4 text-lg font-semibold">Saved QR Codes</h2>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {qrCodes.map((qr: any) => (
-              <div key={qr.id} className="border rounded-lg p-4">
+              <div key={qr.id} className="rounded-lg border border-border p-4">
                 {qr.download_url && (
                   <img
                     src={qr.download_url}
                     alt="QR Code"
-                    className="w-full rounded mb-2"
+                    className="mb-2 w-full rounded"
                   />
                 )}
                 <a
                   href={qr.download_url}
                   download
-                  className="text-sm text-blue-600 hover:text-blue-700"
+                  className="text-sm font-medium text-primary hover:opacity-90"
                 >
                   Download
                 </a>

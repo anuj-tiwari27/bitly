@@ -74,37 +74,39 @@ export default function NewLinkPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="mx-auto max-w-2xl">
       <div className="mb-6">
         <Link
           href="/dashboard/links"
-          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4 mr-1" />
+          <ArrowLeft className="mr-1 h-4 w-4" />
           Back to Links
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl border p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Link2 className="h-5 w-5 text-blue-600" />
+      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="mb-6 flex items-center space-x-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+            <Link2 className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">Create Link</h1>
-            <p className="text-sm text-gray-500">Shorten a URL and track its performance</p>
+            <h1 className="text-xl font-semibold">Create Link</h1>
+            <p className="text-sm text-muted-foreground">
+              Shorten a URL and track its performance
+            </p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+            <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-300">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
               Destination URL <span className="text-red-500">*</span>
             </label>
             <input
@@ -113,13 +115,13 @@ export default function NewLinkPage() {
               value={formData.destination_url}
               onChange={handleChange}
               placeholder="https://example.com/your-long-url"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
               Title (optional)
             </label>
             <input
@@ -128,12 +130,12 @@ export default function NewLinkPage() {
               value={formData.title}
               onChange={handleChange}
               placeholder="My awesome link"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
               Description (optional)
             </label>
             <textarea
@@ -142,13 +144,13 @@ export default function NewLinkPage() {
               onChange={handleChange}
               rows={2}
               placeholder="A brief description of this link"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 Custom Short Code (optional)
               </label>
               <input
@@ -157,20 +159,22 @@ export default function NewLinkPage() {
                 value={formData.custom_code}
                 onChange={handleChange}
                 placeholder="my-link"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
               />
-              <p className="text-xs text-gray-500 mt-1">Leave empty for auto-generated code</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Leave empty for auto-generated code
+              </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 Campaign (optional)
               </label>
               <select
                 name="campaign_id"
                 value={formData.campaign_id}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-transparent focus:ring-2 focus:ring-primary"
               >
                 <option value="">No campaign</option>
                 {campaigns.map((campaign: any) => (
@@ -184,7 +188,7 @@ export default function NewLinkPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 Expiration Date (optional)
               </label>
               <input
@@ -192,12 +196,12 @@ export default function NewLinkPage() {
                 name="expires_at"
                 value={formData.expires_at}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-transparent focus:ring-2 focus:ring-primary"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 Max Clicks (optional)
               </label>
               <input
@@ -207,13 +211,13 @@ export default function NewLinkPage() {
                 onChange={handleChange}
                 placeholder="Unlimited"
                 min="1"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
               Password Protection (optional)
             </label>
             <input
@@ -222,25 +226,25 @@ export default function NewLinkPage() {
               value={formData.password}
               onChange={handleChange}
               placeholder="Enter password to protect link"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
             />
           </div>
 
           <div className="flex justify-end space-x-4 pt-4">
             <Link
               href="/dashboard/links"
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              className="rounded-lg border border-border px-6 py-3 text-sm hover:bg-muted"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              className="flex items-center rounded-lg bg-primary px-6 py-3 text-sm text-primary-foreground transition disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-90"
             >
               {createMutation.isPending ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Creating...
                 </>
               ) : (

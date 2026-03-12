@@ -145,7 +145,7 @@ export default function DashboardLayout({
           <div className="p-4 border-t border-slate-800">
             <div className="flex items-center space-x-3 mb-3">
               <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center">
-                <span className="text-primary font-medium">
+                <span className="text-slate-100 font-medium">
                   {user.first_name?.[0] || user.email[0].toUpperCase()}
                 </span>
               </div>

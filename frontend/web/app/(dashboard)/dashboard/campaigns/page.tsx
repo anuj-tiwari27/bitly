@@ -38,60 +38,64 @@ export default function CampaignsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Campaigns</h1>
-          <p className="text-gray-600 mt-1">Organize your links into campaigns</p>
+          <h1 className="text-2xl font-bold text-foreground">Campaigns</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Organize your links into campaigns
+          </p>
         </div>
         <Link
           href="/dashboard/campaigns/new"
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="flex items-center rounded-lg bg-primary px-4 py-2 text-primary-foreground transition hover:opacity-90"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="mr-2 h-4 w-4" />
           New Campaign
         </Link>
       </div>
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search campaigns..."
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full rounded-lg border border-border bg-card pl-10 pr-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
         />
       </div>
 
       {/* Campaigns Grid */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
         </div>
       ) : campaigns.length === 0 ? (
-        <div className="bg-white rounded-xl border p-12 text-center">
-          <Megaphone className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No campaigns yet</h3>
-          <p className="text-gray-500 mb-4">Create your first campaign to organize your links</p>
+        <div className="rounded-xl border bg-card p-12 text-center text-card-foreground">
+          <Megaphone className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+          <h3 className="mb-2 text-lg font-medium">No campaigns yet</h3>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Create your first campaign to organize your links
+          </p>
           <Link
             href="/dashboard/campaigns/new"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-primary-foreground transition hover:opacity-90"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             New Campaign
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {campaigns.map((campaign: any) => (
             <div
               key={campaign.id}
-              className="bg-white rounded-xl border hover:shadow-md transition"
+              className="rounded-xl border bg-card text-card-foreground transition hover:shadow-md"
             >
               <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
+                <div className="mb-4 flex items-start justify-between">
                   <Link
                     href={`/dashboard/campaigns/${campaign.id}`}
-                    className="text-lg font-semibold text-gray-900 hover:text-blue-600"
+                    className="text-lg font-semibold hover:text-primary"
                   >
                     {campaign.name}
                   </Link>
@@ -105,12 +109,12 @@ export default function CampaignsPage() {
                 </div>
 
                 {campaign.description && (
-                  <p className="text-sm text-gray-500 mb-4 line-clamp-2">
+                  <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
                     {campaign.description}
                   </p>
                 )}
 
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                   <div className="flex items-center">
                     <Link2 className="h-4 w-4 mr-1" />
                     {campaign.link_count} links
@@ -122,15 +126,15 @@ export default function CampaignsPage() {
                 </div>
               </div>
 
-              <div className="px-6 py-3 bg-gray-50 border-t flex items-center justify-between rounded-b-xl">
-                <div className="flex items-center text-xs text-gray-500">
-                  <Calendar className="h-3.5 w-3.5 mr-1" />
+              <div className="flex items-center justify-between rounded-b-xl border-t border-border bg-muted/40 px-6 py-3">
+                <div className="flex items-center text-xs text-muted-foreground">
+                  <Calendar className="mr-1 h-3.5 w-3.5" />
                   {formatDate(campaign.created_at)}
                 </div>
                 <div className="flex items-center space-x-2">
                   <Link
                     href={`/dashboard/campaigns/${campaign.id}`}
-                    className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-xs font-medium text-primary hover:opacity-90"
                   >
                     View
                   </Link>
@@ -140,9 +144,9 @@ export default function CampaignsPage() {
                         deleteMutation.mutate(campaign.id)
                       }
                     }}
-                    className="p-1 hover:bg-red-50 rounded"
+                    className="rounded p-1 hover:bg-red-500/10"
                   >
-                    <Trash2 className="h-4 w-4 text-red-500" />
+                    <Trash2 className="h-4 w-4 text-red-400" />
                   </button>
                 </div>
               </div>
