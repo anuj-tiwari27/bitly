@@ -15,14 +15,28 @@ class Settings(BaseSettings):
 
     base_url: str = "http://localhost:3000"
     short_domain: str = "http://localhost:8005"
-    
+
     def get_app_base_url(self) -> str:
-        """App base URL for document links. Prefer base_url; derive from short_domain when using tunnel."""
+        """
+        App base URL for document links.
+
+        We want document download URLs to point at the main app (frontend)
+        domain, not the redirect short-domain. This ensures destinations like
+        `/api/documents/{id}` are served via the frontend/document-service
+        proxy, while short links continue to use SHORT_DOMAIN separately.
+        """
         base = (self.base_url or "").rstrip("/")
         short_base = (self.short_domain or "").replace("/r", "").rstrip("/")
-        # When using tunnel (short_domain has non-localhost), use it so document URL matches
+
+        # Prefer explicit base_url when it is set to a non-localhost host
+        if base and "localhost" not in base:
+            return base
+
+        # Fallback: if only short_domain is non-localhost, use that
         if short_base and "localhost" not in short_base:
             return short_base
+
+        # Default local development behaviour
         return base or "http://localhost:3000"
 
     environment: str = "development"
