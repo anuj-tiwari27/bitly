@@ -43,94 +43,94 @@ export default function AdminOrganizationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Organizations</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Organizations</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           All companies using the platform, with aggregated usage and activity.
         </p>
       </div>
 
-      <div className="bg-white border rounded-xl overflow-hidden">
-        <div className="border-b px-4 py-3 flex items-center justify-between">
-          <p className="text-sm text-gray-600">
+      <div className="overflow-hidden rounded-xl border bg-card text-card-foreground">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <p className="text-sm text-muted-foreground">
             Showing {orgs.length} of {total} organizations
           </p>
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="flex h-32 items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
           </div>
         ) : (
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="text-gray-500 border-b bg-gray-50">
-                <th className="py-2 px-4 text-left">Name</th>
-                <th className="py-2 px-4 text-left">Slug</th>
-                <th className="py-2 px-4 text-left">Plan</th>
-                <th className="py-2 px-4 text-left">Status</th>
-                <th className="py-2 px-4 text-left">Created</th>
-                <th className="py-2 px-4 text-right">Members</th>
-                <th className="py-2 px-4 text-right">Links</th>
-                <th className="py-2 px-4 text-right">QR Codes</th>
-                <th className="py-2 px-4 text-right">Total Clicks</th>
-                <th className="py-2 px-4 text-right">Actions</th>
+              <tr className="border-b border-border bg-muted/40 text-muted-foreground">
+                <th className="px-4 py-2 text-left">Name</th>
+                <th className="px-4 py-2 text-left">Slug</th>
+                <th className="px-4 py-2 text-left">Plan</th>
+                <th className="px-4 py-2 text-left">Status</th>
+                <th className="px-4 py-2 text-left">Created</th>
+                <th className="px-4 py-2 text-right">Members</th>
+                <th className="px-4 py-2 text-right">Links</th>
+                <th className="px-4 py-2 text-right">QR Codes</th>
+                <th className="px-4 py-2 text-right">Total Clicks</th>
+                <th className="px-4 py-2 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {orgs.map((org: any) => (
-                <tr key={org.id} className="border-b last:border-0">
-                  <td className="py-2 px-4 text-gray-900">{org.name}</td>
-                  <td className="py-2 px-4 text-gray-600">{org.slug}</td>
-                  <td className="py-2 px-4 text-gray-600">
+                <tr key={org.id} className="border-b border-border last:border-0">
+                  <td className="px-4 py-2 text-card-foreground">{org.name}</td>
+                  <td className="px-4 py-2 text-muted-foreground">{org.slug}</td>
+                  <td className="px-4 py-2 text-muted-foreground">
                     {org.plan_type || 'free'}
                   </td>
-                  <td className="py-2 px-4">
+                  <td className="px-4 py-2">
                     <span
-                      className={`inline-flex px-2 py-1 rounded-full text-xs ${
+                      className={`inline-flex rounded-full px-2 py-1 text-xs ${
                         org.status === 'active'
-                          ? 'bg-green-50 text-green-700'
+                          ? 'bg-emerald-500/15 text-emerald-300'
                           : org.status === 'suspended'
-                          ? 'bg-yellow-50 text-yellow-800'
-                          : 'bg-gray-100 text-gray-700'
+                            ? 'bg-amber-500/15 text-amber-300'
+                            : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {org.status.charAt(0).toUpperCase() + org.status.slice(1)}
                     </span>
                   </td>
-                  <td className="py-2 px-4 text-gray-600">
+                  <td className="px-4 py-2 text-muted-foreground">
                     {org.created_at ? formatDate(org.created_at) : ''}
                   </td>
-                  <td className="py-2 px-4 text-right text-gray-700">
+                  <td className="px-4 py-2 text-right text-muted-foreground">
                     {formatNumber(org.members_count)}
                   </td>
-                  <td className="py-2 px-4 text-right text-gray-700">
+                  <td className="px-4 py-2 text-right text-muted-foreground">
                     {formatNumber(org.link_count)}
                   </td>
-                  <td className="py-2 px-4 text-right text-gray-700">
+                  <td className="px-4 py-2 text-right text-muted-foreground">
                     {formatNumber(org.qr_count)}
                   </td>
-                  <td className="py-2 px-4 text-right font-medium text-gray-900">
+                  <td className="px-4 py-2 text-right font-medium text-card-foreground">
                     {formatNumber(org.total_clicks)}
                   </td>
-                  <td className="py-2 px-4 text-right text-xs space-x-2">
+                  <td className="space-x-2 px-4 py-2 text-right text-xs">
                     {org.status === 'suspended' ? (
                       <button
                         onClick={() => activateMutation.mutate(org.id)}
-                        className="px-2 py-1 rounded border border-green-600 text-green-700 hover:bg-green-50"
+                        className="rounded border border-emerald-500 px-2 py-1 text-emerald-300 hover:bg-emerald-500/10"
                       >
                         Activate
                       </button>
                     ) : (
                       <button
                         onClick={() => suspendMutation.mutate(org.id)}
-                        className="px-2 py-1 rounded border border-yellow-600 text-yellow-800 hover:bg-yellow-50"
+                        className="rounded border border-amber-500 px-2 py-1 text-amber-300 hover:bg-amber-500/10"
                       >
                         Suspend
                       </button>
                     )}
                     <button
                       onClick={() => deleteMutation.mutate(org.id)}
-                      className="px-2 py-1 rounded border border-red-600 text-red-700 hover:bg-red-50"
+                      className="rounded border border-red-500 px-2 py-1 text-red-300 hover:bg-red-500/10"
                     >
                       Delete
                     </button>
@@ -139,7 +139,7 @@ export default function AdminOrganizationsPage() {
               ))}
               {orgs.length === 0 && (
                 <tr>
-                  <td className="py-6 px-4 text-center text-gray-500" colSpan={7}>
+                  <td className="px-4 py-6 text-center text-sm text-muted-foreground" colSpan={7}>
                     No organizations yet.
                   </td>
                 </tr>
@@ -148,22 +148,22 @@ export default function AdminOrganizationsPage() {
           </table>
         )}
 
-        <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50 text-xs">
-          <span className="text-gray-500">
+        <div className="flex items-center justify-between border-t border-border bg-muted/40 px-4 py-3 text-xs">
+          <span className="text-muted-foreground">
             Page {page} of {totalPages}
           </span>
           <div className="space-x-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="px-3 py-1 border rounded-lg bg-white disabled:opacity-50"
+              className="rounded-lg border border-border bg-card px-3 py-1 disabled:opacity-50"
             >
               Previous
             </button>
             <button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="px-3 py-1 border rounded-lg bg-white disabled:opacity-50"
+              className="rounded-lg border border-border bg-card px-3 py-1 disabled:opacity-50"
             >
               Next
             </button>

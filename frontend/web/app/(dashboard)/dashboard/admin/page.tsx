@@ -36,8 +36,8 @@ export default function AdminOverviewPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Admin Overview</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Admin Overview</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Platform-wide metrics across all customers, users, and links.
         </p>
       </div>
@@ -76,22 +76,22 @@ export default function AdminOverviewPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Top users */}
-        <div className="bg-white border rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Top users by clicks</h2>
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Top users by clicks</h2>
           </div>
           {loadingUsers ? (
-            <div className="flex items-center justify-center h-24">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
+            <div className="flex h-24 items-center justify-center">
+              <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary" />
             </div>
           ) : topUsers.length === 0 ? (
-            <p className="text-sm text-gray-500">No user data yet.</p>
+            <p className="text-sm text-muted-foreground">No user data yet.</p>
           ) : (
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="text-gray-500 border-b">
+                <tr className="border-b text-muted-foreground">
                   <th className="py-2 text-left">Email</th>
                   <th className="py-2 text-right">Links</th>
                   <th className="py-2 text-right">QRs</th>
@@ -100,15 +100,15 @@ export default function AdminOverviewPage() {
               </thead>
               <tbody>
                 {topUsers.map((user: any) => (
-                  <tr key={user.id} className="border-b last:border-0">
-                    <td className="py-2 pr-4 text-gray-900">{user.email}</td>
-                    <td className="py-2 text-right text-gray-700">
+                  <tr key={user.id} className="border-b border-border last:border-0">
+                    <td className="py-2 pr-4 text-card-foreground">{user.email}</td>
+                    <td className="py-2 text-right text-muted-foreground">
                       {formatNumber(user.link_count)}
                     </td>
-                    <td className="py-2 text-right text-gray-700">
+                    <td className="py-2 text-right text-muted-foreground">
                       {formatNumber(user.qr_count)}
                     </td>
-                    <td className="py-2 text-right font-medium text-gray-900">
+                    <td className="py-2 text-right font-medium text-card-foreground">
                       {formatNumber(user.total_clicks)}
                     </td>
                   </tr>
@@ -119,20 +119,20 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Top organizations */}
-        <div className="bg-white border rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Top organizations</h2>
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Top organizations</h2>
           </div>
           {loadingOrgs ? (
-            <div className="flex items-center justify-center h-24">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
+            <div className="flex h-24 items-center justify-center">
+              <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary" />
             </div>
           ) : topOrgs.length === 0 ? (
-            <p className="text-sm text-gray-500">No organizations created yet.</p>
+            <p className="text-sm text-muted-foreground">No organizations created yet.</p>
           ) : (
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="text-gray-500 border-b">
+                <tr className="border-b text-muted-foreground">
                   <th className="py-2 text-left">Name</th>
                   <th className="py-2 text-right">Members</th>
                   <th className="py-2 text-right">Links</th>
@@ -141,15 +141,15 @@ export default function AdminOverviewPage() {
               </thead>
               <tbody>
                 {topOrgs.map((org: any) => (
-                  <tr key={org.id} className="border-b last:border-0">
-                    <td className="py-2 pr-4 text-gray-900">{org.name}</td>
-                    <td className="py-2 text-right text-gray-700">
+                  <tr key={org.id} className="border-b border-border last:border-0">
+                    <td className="py-2 pr-4 text-card-foreground">{org.name}</td>
+                    <td className="py-2 text-right text-muted-foreground">
                       {formatNumber(org.members_count)}
                     </td>
-                    <td className="py-2 text-right text-gray-700">
+                    <td className="py-2 text-right text-muted-foreground">
                       {formatNumber(org.link_count)}
                     </td>
-                    <td className="py-2 text-right font-medium text-gray-900">
+                    <td className="py-2 text-right font-medium text-card-foreground">
                       {formatNumber(org.total_clicks)}
                     </td>
                   </tr>
@@ -175,21 +175,23 @@ function StatCard({
   loading?: boolean
 }) {
   return (
-    <div className="bg-white border rounded-xl p-4 flex items-center justify-between">
+    <div className="flex items-center justify-between rounded-xl border bg-card p-4 text-card-foreground">
       <div>
-        <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
-        <p className="mt-1 text-xl font-semibold text-gray-900">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          {label}
+        </p>
+        <p className="mt-1 text-xl font-semibold">
           {loading ? (
             <span className="inline-flex items-center">
-              <span className="animate-pulse h-5 w-10 bg-gray-100 rounded" />
+              <span className="h-5 w-10 animate-pulse rounded bg-muted" />
             </span>
           ) : (
             formatNumber(value || 0)
           )}
         </p>
       </div>
-      <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-        <Icon className="h-5 w-5 text-blue-600" />
+      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+        <Icon className="h-5 w-5 text-primary" />
       </div>
     </div>
   )

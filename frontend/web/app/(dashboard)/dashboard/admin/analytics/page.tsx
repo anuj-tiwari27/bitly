@@ -150,25 +150,25 @@ export default function AdminAnalyticsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-amber-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Platform Analytics</h1>
+            <Shield className="h-6 w-6 text-amber-400" />
+            <h1 className="text-2xl font-bold text-foreground">Platform Analytics</h1>
           </div>
-          <p className="text-gray-600 mt-1">
+          <p className="mt-1 text-sm text-muted-foreground">
             Platform-wide click analytics and tracking across all users and links
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-white rounded-lg border p-1">
+        <div className="flex items-center gap-2 rounded-lg border bg-card p-1 text-card-foreground">
           {(['7d', '14d', '30d', '90d'] as DateRange[]).map((range) => (
             <button
               key={range}
               onClick={() => setDateRange(range)}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 dateRange === range
-                  ? 'bg-amber-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-amber-500 text-slate-950'
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               {range === '7d' ? '7 Days' : range === '14d' ? '14 Days' : range === '30d' ? '30 Days' : '90 Days'}
@@ -178,8 +178,8 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Real-time Stats */}
-      <div className="bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl p-6 text-white">
-        <div className="flex items-center gap-2 mb-4">
+      <div className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 p-6 text-slate-950">
+        <div className="mb-4 flex items-center gap-2">
           <Zap className="h-5 w-5" />
           <h2 className="text-lg font-semibold">Platform Real-time Activity</h2>
           <span className="flex h-2 w-2 relative ml-2">
@@ -187,10 +187,12 @@ export default function AdminAnalyticsPage() {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
           </span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div>
-            <p className="text-3xl font-bold">{formatNumber(realtime.clicks_last_5_min)}</p>
-            <p className="text-amber-100 text-sm">Clicks (Last 5 min)</p>
+            <p className="text-3xl font-bold">
+              {formatNumber(realtime.clicks_last_5_min)}
+            </p>
+            <p className="text-sm text-amber-100">Clicks (Last 5 min)</p>
           </div>
           <div>
             <p className="text-3xl font-bold">{formatNumber(realtime.clicks_last_hour)}</p>
@@ -204,71 +206,71 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-white rounded-xl border p-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+        <div className="rounded-xl border bg-card p-4 text-card-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-              <MousePointerClick className="h-5 w-5 text-blue-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <MousePointerClick className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{formatNumber(stats.total_clicks)}</p>
-              <p className="text-xs text-gray-500">Total Clicks</p>
+              <p className="text-2xl font-bold">{formatNumber(stats.total_clicks)}</p>
+              <p className="text-xs text-muted-foreground">Total Clicks</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border p-4">
+        <div className="rounded-xl border bg-card p-4 text-card-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-              <Users className="h-5 w-5 text-green-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+              <Users className="h-5 w-5 text-emerald-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{formatNumber(stats.unique_visitors)}</p>
-              <p className="text-xs text-gray-500">Unique Visitors</p>
+              <p className="text-2xl font-bold">{formatNumber(stats.unique_visitors)}</p>
+              <p className="text-xs text-muted-foreground">Unique Visitors</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border p-4">
+        <div className="rounded-xl border bg-card p-4 text-card-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-orange-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
+              <TrendingUp className="h-5 w-5 text-amber-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{formatNumber(stats.clicks_today)}</p>
-              <p className="text-xs text-gray-500">Today</p>
+              <p className="text-2xl font-bold">{formatNumber(stats.clicks_today)}</p>
+              <p className="text-xs text-muted-foreground">Today</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border p-4">
+        <div className="rounded-xl border bg-card p-4 text-card-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-purple-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/10">
+              <Calendar className="h-5 w-5 text-secondary" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{formatNumber(stats.clicks_this_week)}</p>
-              <p className="text-xs text-gray-500">This Week</p>
+              <p className="text-2xl font-bold">{formatNumber(stats.clicks_this_week)}</p>
+              <p className="text-xs text-muted-foreground">This Week</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border p-4">
+        <div className="rounded-xl border bg-card p-4 text-card-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-pink-50 rounded-lg flex items-center justify-center">
-              <BarChart3 className="h-5 w-5 text-pink-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-fuchsia-500/10">
+              <BarChart3 className="h-5 w-5 text-fuchsia-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{formatNumber(stats.clicks_this_month)}</p>
-              <p className="text-xs text-gray-500">This Month</p>
+              <p className="text-2xl font-bold">{formatNumber(stats.clicks_this_month)}</p>
+              <p className="text-xs text-muted-foreground">This Month</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Clicks Over Time Chart */}
-      <div className="bg-white rounded-xl border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Platform Clicks Over Time</h2>
+      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <h2 className="mb-6 text-lg font-semibold">Platform Clicks Over Time</h2>
         <div className="h-80">
           {clicksData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
@@ -327,7 +329,7 @@ export default function AdminAnalyticsPage() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-full flex items-center justify-center text-gray-500">
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
               No data available yet
             </div>
           )}
@@ -335,10 +337,10 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Hourly Distribution */}
-      <div className="bg-white rounded-xl border p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Clock className="h-5 w-5 text-gray-500" />
-          <h2 className="text-lg font-semibold text-gray-900">Hourly Click Distribution</h2>
+      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="mb-6 flex items-center gap-2">
+          <Clock className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">Hourly Click Distribution</h2>
         </div>
         <div className="h-48">
           {hourly.length > 0 ? (
@@ -360,15 +362,17 @@ export default function AdminAnalyticsPage() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-full flex items-center justify-center text-gray-500">No data</div>
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+              No data
+            </div>
           )}
         </div>
       </div>
 
       {/* Device & Browser Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl border p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Devices</h2>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <h2 className="mb-4 text-lg font-semibold">Devices</h2>
           {devicesData.length > 0 ? (
             <div className="space-y-3">
               {devicesData.map((device: any, index: number) => {
@@ -377,137 +381,167 @@ export default function AdminAnalyticsPage() {
                   <div key={device.device_type} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div
-                        className="w-2 h-2 rounded-full"
+                        className="h-2 w-2 rounded-full"
                         style={{ backgroundColor: COLORS[index % COLORS.length] }}
                       />
-                      <Icon className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm text-gray-700 capitalize">{device.device_type}</span>
+                      <Icon className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm capitalize text-card-foreground">
+                        {device.device_type}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">{formatNumber(device.clicks)}</span>
-                      <span className="text-xs text-gray-500 w-12 text-right">{device.percentage}%</span>
+                      <span className="w-12 text-right text-xs text-muted-foreground">
+                        {device.percentage}%
+                      </span>
                     </div>
                   </div>
                 )
               })}
             </div>
           ) : (
-            <div className="h-32 flex items-center justify-center text-gray-500 text-sm">No data</div>
+            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+              No data
+            </div>
           )}
         </div>
 
-        <div className="bg-white rounded-xl border p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Browsers</h2>
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <h2 className="mb-4 text-lg font-semibold">Browsers</h2>
           {browsersData.length > 0 ? (
             <div className="space-y-3">
               {browsersData.slice(0, 6).map((browser: any, index: number) => (
                 <div key={browser.browser} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div
-                      className="w-2 h-2 rounded-full"
+                      className="h-2 w-2 rounded-full"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
-                    <span className="text-sm text-gray-700">{browser.browser}</span>
+                    <span className="text-sm text-card-foreground">{browser.browser}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">{formatNumber(browser.clicks)}</span>
-                    <span className="text-xs text-gray-500 w-12 text-right">{browser.percentage}%</span>
+                    <span className="text-sm font-medium">
+                      {formatNumber(browser.clicks)}
+                    </span>
+                    <span className="w-12 text-right text-xs text-muted-foreground">
+                      {browser.percentage}%
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="h-32 flex items-center justify-center text-gray-500 text-sm">No data</div>
+            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+              No data
+            </div>
           )}
         </div>
 
-        <div className="bg-white rounded-xl border p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Operating Systems</h2>
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <h2 className="mb-4 text-lg font-semibold">Operating Systems</h2>
           {osData.length > 0 ? (
             <div className="space-y-3">
               {osData.slice(0, 6).map((os: any, index: number) => (
                 <div key={os.os} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div
-                      className="w-2 h-2 rounded-full"
+                      className="h-2 w-2 rounded-full"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
-                    <span className="text-sm text-gray-700">{os.os}</span>
+                    <span className="text-sm text-card-foreground">{os.os}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">{formatNumber(os.clicks)}</span>
-                    <span className="text-xs text-gray-500 w-12 text-right">{os.percentage}%</span>
+                    <span className="text-sm font-medium">
+                      {formatNumber(os.clicks)}
+                    </span>
+                    <span className="w-12 text-right text-xs text-muted-foreground">
+                      {os.percentage}%
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="h-32 flex items-center justify-center text-gray-500 text-sm">No data</div>
+            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+              No data
+            </div>
           )}
         </div>
       </div>
 
       {/* UTM Analytics */}
-      <div className="bg-white rounded-xl border p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Share2 className="h-5 w-5 text-gray-500" />
-          <h2 className="text-lg font-semibold text-gray-900">UTM Campaign Tracking</h2>
+      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="mb-6 flex items-center gap-2">
+          <Share2 className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">UTM Campaign Tracking</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Sources</h3>
+            <h3 className="mb-3 text-sm font-medium text-card-foreground">Sources</h3>
             {utmSourcesData.length > 0 ? (
               <div className="space-y-2">
                 {utmSourcesData.slice(0, 5).map((source: any) => (
                   <div key={source.source} className="flex items-center justify-between py-1">
-                    <span className="text-sm text-gray-600 truncate">{source.source}</span>
-                    <span className="text-sm font-medium ml-2">{formatNumber(source.clicks)}</span>
+                    <span className="truncate text-sm text-muted-foreground">
+                      {source.source}
+                    </span>
+                    <span className="ml-2 text-sm font-medium">
+                      {formatNumber(source.clicks)}
+                    </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">No UTM source data</p>
+              <p className="text-sm text-muted-foreground">No UTM source data</p>
             )}
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Mediums</h3>
+            <h3 className="mb-3 text-sm font-medium text-card-foreground">Mediums</h3>
             {utmMediumsData.length > 0 ? (
               <div className="space-y-2">
                 {utmMediumsData.slice(0, 5).map((medium: any) => (
                   <div key={medium.medium} className="flex items-center justify-between py-1">
-                    <span className="text-sm text-gray-600 truncate">{medium.medium}</span>
-                    <span className="text-sm font-medium ml-2">{formatNumber(medium.clicks)}</span>
+                    <span className="truncate text-sm text-muted-foreground">
+                      {medium.medium}
+                    </span>
+                    <span className="ml-2 text-sm font-medium">
+                      {formatNumber(medium.clicks)}
+                    </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">No UTM medium data</p>
+              <p className="text-sm text-muted-foreground">No UTM medium data</p>
             )}
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Campaigns</h3>
+            <h3 className="mb-3 text-sm font-medium text-card-foreground">Campaigns</h3>
             {utmCampaignsData.length > 0 ? (
               <div className="space-y-2">
                 {utmCampaignsData.slice(0, 5).map((campaign: any) => (
                   <div key={campaign.campaign} className="flex items-center justify-between py-1">
-                    <span className="text-sm text-gray-600 truncate">{campaign.campaign}</span>
-                    <span className="text-sm font-medium ml-2">{formatNumber(campaign.clicks)}</span>
+                    <span className="truncate text-sm text-muted-foreground">
+                      {campaign.campaign}
+                    </span>
+                    <span className="ml-2 text-sm font-medium">
+                      {formatNumber(campaign.clicks)}
+                    </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">No UTM campaign data</p>
+              <p className="text-sm text-muted-foreground">No UTM campaign data</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Countries & Referrers */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Globe className="h-5 w-5 text-gray-500" />
-            <h2 className="text-lg font-semibold text-gray-900">Top Countries</h2>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <div className="mb-4 flex items-center gap-2">
+            <Globe className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold">Top Countries</h2>
           </div>
           {countriesData.length > 0 ? (
             <div className="space-y-3">
@@ -515,86 +549,116 @@ export default function AdminAnalyticsPage() {
                 <div key={country.country_code} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{getFlagEmoji(country.country_code)}</span>
-                    <span className="text-sm text-gray-700">{country.country_name}</span>
+                    <span className="text-sm text-card-foreground">
+                      {country.country_name}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-24 bg-gray-100 rounded-full h-2">
+                    <div className="h-2 w-24 rounded-full bg-muted">
                       <div
                         className="h-2 rounded-full bg-amber-500"
                         style={{ width: `${country.percentage}%` }}
                       />
                     </div>
-                    <span className="text-sm font-medium w-16 text-right">{formatNumber(country.clicks)}</span>
+                    <span className="w-16 text-right text-sm font-medium">
+                      {formatNumber(country.clicks)}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="h-40 flex items-center justify-center text-gray-500">No data available</div>
+            <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+              No data available
+            </div>
           )}
         </div>
 
-        <div className="bg-white rounded-xl border p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Referrers</h2>
+        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+          <h2 className="mb-4 text-lg font-semibold">Top Referrers</h2>
           {referrersData.length > 0 ? (
             <div className="space-y-3">
               {referrersData.slice(0, 8).map((referrer: any) => (
                 <div key={referrer.referrer} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700 truncate">{referrer.referrer || 'Direct'}</span>
+                  <span className="truncate text-sm text-muted-foreground">
+                    {referrer.referrer || 'Direct'}
+                  </span>
                   <div className="flex items-center gap-3">
-                    <div className="w-24 bg-gray-100 rounded-full h-2">
+                    <div className="h-2 w-24 rounded-full bg-muted">
                       <div
-                        className="h-2 rounded-full bg-green-500"
+                        className="h-2 rounded-full bg-emerald-400"
                         style={{ width: `${referrer.percentage}%` }}
                       />
                     </div>
-                    <span className="text-sm font-medium w-16 text-right">{formatNumber(referrer.clicks)}</span>
+                    <span className="w-16 text-right text-sm font-medium">
+                      {formatNumber(referrer.clicks)}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="h-40 flex items-center justify-center text-gray-500">No data available</div>
+            <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+              No data available
+            </div>
           )}
         </div>
       </div>
 
       {/* Top Links (Platform-wide) */}
-      <div className="bg-white rounded-xl border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Performing Links (Platform-wide)</h2>
+      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <h2 className="mb-4 text-lg font-semibold">
+          Top Performing Links (Platform-wide)
+        </h2>
         {topLinksData.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase py-3">#</th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase py-3">Short Code</th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase py-3">Destination</th>
-                  <th className="text-right text-xs font-medium text-gray-500 uppercase py-3">Clicks</th>
-                  <th className="text-right text-xs font-medium text-gray-500 uppercase py-3">Unique</th>
+                  <th className="py-3 text-left text-xs font-medium uppercase text-muted-foreground">
+                    #
+                  </th>
+                  <th className="py-3 text-left text-xs font-medium uppercase text-muted-foreground">
+                    Short Code
+                  </th>
+                  <th className="py-3 text-left text-xs font-medium uppercase text-muted-foreground">
+                    Destination
+                  </th>
+                  <th className="py-3 text-right text-xs font-medium uppercase text-muted-foreground">
+                    Clicks
+                  </th>
+                  <th className="py-3 text-right text-xs font-medium uppercase text-muted-foreground">
+                    Unique
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {topLinksData.slice(0, 10).map((link: any, index: number) => (
-                  <tr key={link.link_id || index} className="border-b last:border-0">
+                  <tr key={link.link_id || index} className="border-b border-border last:border-0">
                     <td className="py-3">
-                      <span className="w-6 h-6 rounded-full bg-amber-50 text-amber-600 text-xs font-medium flex items-center justify-center">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/10 text-xs font-medium text-amber-300">
                         {index + 1}
                       </span>
                     </td>
                     <td className="py-3">
-                      <span className="font-mono text-sm text-gray-900">{link.short_code}</span>
+                      <span className="font-mono text-sm text-card-foreground">
+                        {link.short_code}
+                      </span>
                     </td>
                     <td className="py-3">
-                      <span className="text-sm text-gray-600 truncate max-w-xs block">
+                      <span className="block max-w-xs truncate text-sm text-muted-foreground">
                         {link.destination_url}
                       </span>
                     </td>
                     <td className="py-3 text-right">
-                      <span className="text-sm font-medium text-gray-900">{formatNumber(link.clicks)}</span>
+                      <span className="text-sm font-medium text-card-foreground">
+                        {formatNumber(link.clicks)}
+                      </span>
                     </td>
                     <td className="py-3 text-right">
-                      <span className="text-sm text-gray-500">{formatNumber(link.unique_visitors)}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {formatNumber(link.unique_visitors)}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -602,7 +666,9 @@ export default function AdminAnalyticsPage() {
             </table>
           </div>
         ) : (
-          <div className="h-40 flex items-center justify-center text-gray-500">No data available</div>
+          <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+            No data available
+          </div>
         )}
       </div>
     </div>

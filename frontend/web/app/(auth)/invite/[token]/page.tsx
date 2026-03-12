@@ -74,24 +74,24 @@ export default function InviteAcceptPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
       </div>
     )
   }
 
   if (!invite) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full space-y-6 text-center">
-          <p className="text-lg font-semibold text-gray-900">Invitation not found</p>
-          <p className="text-gray-600 text-sm">
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
+        <div className="w-full max-w-md space-y-6 text-center">
+          <p className="text-lg font-semibold text-foreground">Invitation not found</p>
+          <p className="text-sm text-muted-foreground">
             This invite may have expired or already been used. Please contact your organization
             owner or admin.
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center justify-center rounded-lg border border-border px-4 py-2 text-sm text-foreground hover:bg-muted"
           >
             Go to login
           </Link>
@@ -101,52 +101,59 @@ export default function InviteAcceptPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full space-y-8">
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
+      <div className="w-full max-w-md space-y-8 rounded-2xl border border-slate-800 bg-card/70 p-6 shadow-xl backdrop-blur">
         <div className="text-center">
           <Link href="/" className="flex items-center justify-center space-x-2">
-            <Link2 className="h-10 w-10 text-blue-600" />
-            <span className="text-3xl font-bold text-gray-900">Bitly</span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary">
+              <span className="text-sm font-semibold text-white">tl</span>
+            </div>
+            <div className="flex flex-col leading-tight text-left">
+              <span className="text-xl font-bold text-foreground">thelittleurl.com</span>
+              <span className="text-xs text-muted-foreground">
+                Pixel transformation for links.
+              </span>
+            </div>
           </Link>
-          <h2 className="mt-6 text-2xl font-bold text-gray-900">
-            Join {invite.organization_id ? 'the organization' : 'Bitly'}
+          <h2 className="mt-6 text-2xl font-bold text-foreground">
+            Join {invite.organization_id ? 'the organization' : 'thelittleurl.com'}
           </h2>
-          <p className="mt-2 text-gray-600 text-sm">
+          <p className="mt-2 text-sm text-muted-foreground">
             You&apos;ve been invited as <span className="font-semibold">{invite.role}</span> for
             this organization. Complete your account to continue.
           </p>
-          <p className="mt-1 text-xs text-gray-500 flex items-center justify-center">
-            <Mail className="h-3 w-3 mr-1" />
+          <p className="mt-1 flex items-center justify-center text-xs text-muted-foreground">
+            <Mail className="mr-1 h-3 w-3" />
             {invite.email}
           </p>
         </div>
 
         <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+            <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-300">
               {error}
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 First name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
                 <input
                   type="text"
                   name="first_name"
                   value={form.first_name}
                   onChange={handleChange}
-                  className="pl-9 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full rounded-lg border border-border bg-card px-3 py-2 pl-9 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
                   placeholder="John"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 Last name
               </label>
               <input
@@ -154,46 +161,46 @@ export default function InviteAcceptPage() {
                 name="last_name"
                 value={form.last_name}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
                 placeholder="Doe"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
               <input
                 type="password"
                 name="password"
                 value={form.password}
                 onChange={handleChange}
                 required
-                className="pl-9 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 pl-9 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
                 placeholder="••••••••"
               />
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               At least 8 characters with uppercase, lowercase, and numbers.
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">
               Confirm password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
               <input
                 type="password"
                 name="confirmPassword"
                 value={form.confirmPassword}
                 onChange={handleChange}
                 required
-                className="pl-9 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 pl-9 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
                 placeholder="••••••••"
               />
             </div>
@@ -202,7 +209,7 @@ export default function InviteAcceptPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="flex w-full justify-center rounded-lg bg-primary px-4 py-3 text-sm text-primary-foreground shadow-sm transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Accept invitation'}
           </button>

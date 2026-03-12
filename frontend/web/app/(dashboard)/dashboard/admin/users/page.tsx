@@ -21,59 +21,59 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Users</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           All registered user accounts with aggregated usage statistics.
         </p>
       </div>
 
-      <div className="bg-white border rounded-xl overflow-hidden">
-        <div className="border-b px-4 py-3 flex items-center justify-between">
-          <p className="text-sm text-gray-600">
+      <div className="overflow-hidden rounded-xl border bg-card text-card-foreground">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <p className="text-sm text-muted-foreground">
             Showing {users.length} of {total} users
           </p>
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="flex h-32 items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
           </div>
         ) : (
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="text-gray-500 border-b bg-gray-50">
-                <th className="py-2 px-4 text-left">Email</th>
-                <th className="py-2 px-4 text-left">Created</th>
-                <th className="py-2 px-4 text-right">Campaigns</th>
-                <th className="py-2 px-4 text-right">Links</th>
-                <th className="py-2 px-4 text-right">QR Codes</th>
-                <th className="py-2 px-4 text-right">Total Clicks</th>
+              <tr className="border-b border-border bg-muted/40 text-muted-foreground">
+                <th className="px-4 py-2 text-left">Email</th>
+                <th className="px-4 py-2 text-left">Created</th>
+                <th className="px-4 py-2 text-right">Campaigns</th>
+                <th className="px-4 py-2 text-right">Links</th>
+                <th className="px-4 py-2 text-right">QR Codes</th>
+                <th className="px-4 py-2 text-right">Total Clicks</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user: any) => (
-                <tr key={user.id} className="border-b last:border-0">
-                  <td className="py-2 px-4 text-gray-900">{user.email}</td>
-                  <td className="py-2 px-4 text-gray-600">
+                <tr key={user.id} className="border-b border-border last:border-0">
+                  <td className="px-4 py-2 text-card-foreground">{user.email}</td>
+                  <td className="px-4 py-2 text-muted-foreground">
                     {user.created_at ? formatDate(user.created_at) : ''}
                   </td>
-                  <td className="py-2 px-4 text-right text-gray-700">
+                  <td className="px-4 py-2 text-right text-muted-foreground">
                     {formatNumber(user.campaign_count)}
                   </td>
-                  <td className="py-2 px-4 text-right text-gray-700">
+                  <td className="px-4 py-2 text-right text-muted-foreground">
                     {formatNumber(user.link_count)}
                   </td>
-                  <td className="py-2 px-4 text-right text-gray-700">
+                  <td className="px-4 py-2 text-right text-muted-foreground">
                     {formatNumber(user.qr_count)}
                   </td>
-                  <td className="py-2 px-4 text-right font-medium text-gray-900">
+                  <td className="px-4 py-2 text-right font-medium text-card-foreground">
                     {formatNumber(user.total_clicks)}
                   </td>
                 </tr>
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td className="py-6 px-4 text-center text-gray-500" colSpan={6}>
+                  <td className="px-4 py-6 text-center text-sm text-muted-foreground" colSpan={6}>
                     No users yet.
                   </td>
                 </tr>
@@ -82,22 +82,22 @@ export default function AdminUsersPage() {
           </table>
         )}
 
-        <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50 text-xs">
-          <span className="text-gray-500">
+        <div className="flex items-center justify-between border-t border-border bg-muted/40 px-4 py-3 text-xs">
+          <span className="text-muted-foreground">
             Page {page} of {totalPages}
           </span>
           <div className="space-x-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="px-3 py-1 border rounded-lg bg-white disabled:opacity-50"
+              className="rounded-lg border border-border bg-card px-3 py-1 disabled:opacity-50"
             >
               Previous
             </button>
             <button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="px-3 py-1 border rounded-lg bg-white disabled:opacity-50"
+              className="rounded-lg border border-border bg-card px-3 py-1 disabled:opacity-50"
             >
               Next
             </button>
