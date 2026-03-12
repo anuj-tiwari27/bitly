@@ -39,6 +39,14 @@ class DocumentService:
         file_data: bytes,
         content_type: str,
     ) -> Document:
+        """
+        Create a document record and persist the correct storage key.
+
+        We first insert a placeholder row to obtain the document ID, then
+        derive the storage key from that ID and update both the database
+        row and the stored file path. It is important to flush AFTER
+        setting the final storage_key so downloads can locate the file.
+        """
         storage_key_placeholder = "pending"
         doc = Document(
             user_id=user_id,
@@ -50,13 +58,19 @@ class DocumentService:
             file_size=len(file_data),
         )
         self.db.add(doc)
+        # Initial flush to get generated ID for this document
         await self.db.flush()
 
+        # Compute final storage key based on the persisted ID
         storage_key = get_storage_key(str(user_id), str(doc.id), filename)
         doc.storage_key = storage_key
+        # Flush again so the updated storage_key is written to the database
+        await self.db.flush()
 
         try:
-            uploaded = await self.storage.upload_file(file_data, storage_key, content_type)
+            uploaded = await self.storage.upload_file(
+                file_data, storage_key, content_type
+            )
         except Exception as e:
             logger.error(f"Storage upload failed: {e}")
             raise ValueError(f"Failed to upload document to storage: {e}")
