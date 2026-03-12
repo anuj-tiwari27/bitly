@@ -123,9 +123,65 @@ This will start:
 
 ### Accessing the Application
 
-- **Frontend**: http://localhost:3000
-- **API Gateway**: http://localhost
+- **App (users)**: http://localhost:3000
+- **API Gateway**: http://localhost (port 80)
 - **Traefik Dashboard**: http://localhost:8080
+
+### Login URLs
+
+- **General users**: `/login` — Register and sign in to create links, campaigns, QR codes, and view analytics.
+- **Admins**: `/admin` — Separate admin sign-in. Only accounts with the **admin** role can access. After sign-in, admins are taken to the platform admin dashboard (users, organizations, usage).
+
+Use **http://localhost:3000/login** for customers and **http://localhost:3000/admin** for your internal admin team.
+
+### How to create an admin user
+
+There are no admin accounts by default. To make someone an admin:
+
+1. **Ensure the user exists** — They must have registered at least once (e.g. via `/register` or `/login`).
+2. **Set the seed email** — In the project root `.env` add:
+   ```env
+   SEED_ADMIN_EMAIL=their-email@example.com
+   ```
+3. **Restart the stack** — So the RBAC service runs its startup logic:
+   ```bash
+   docker-compose down && docker-compose up -d --build
+   ```
+4. On startup, the RBAC service assigns the **admin** role to that user. They can then sign in at **/admin** and access the admin dashboard.
+5. (Optional) Remove `SEED_ADMIN_EMAIL` from `.env` after the first run so you don’t re-seed on every restart.
+
+To add more admins later, either set `SEED_ADMIN_EMAIL` again and restart, or have an existing admin assign the role via your own process (e.g. direct DB update or a future “manage roles” UI).
+
+### Deployment (live link)
+
+To expose the app on a public URL (e.g. for demos or a staging environment):
+
+1. **Start the stack** on your machine or server:
+   ```bash
+   docker-compose up -d --build
+   ```
+2. **Expose port 3000** with a tunnel. Example with [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/):
+   ```bash
+   cloudflared tunnel --url http://localhost:3000
+   ```
+   Use the printed URL (e.g. `https://xyz.trycloudflare.com`) as your live link.
+3. **Set the public base URL** in `.env` so short links and redirects use it:
+   ```env
+   SHORT_DOMAIN=https://xyz.trycloudflare.com/r
+   NEXT_PUBLIC_REDIRECT_URL=https://xyz.trycloudflare.com
+   ```
+   Replace `xyz.trycloudflare.com` with your actual tunnel host.
+4. **Restart the frontend** (or full stack) so it picks up the new env:
+   ```bash
+   docker-compose up -d --build frontend
+   ```
+
+Then:
+
+- **General users**: `https://your-tunnel-url/login`
+- **Admins**: `https://your-tunnel-url/admin`
+
+For production, deploy the stack to a VPS or cloud (e.g. Docker on a single host or Kubernetes) and put it behind a domain, SSL, and optionally a CDN; use the same env vars so `SHORT_DOMAIN` and `NEXT_PUBLIC_REDIRECT_URL` match your public base URL.
 
 ## API Endpoints
 

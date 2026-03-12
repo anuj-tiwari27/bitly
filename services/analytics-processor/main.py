@@ -58,7 +58,8 @@ def insert_events_to_clickhouse(events: List[Dict[str, Any]]) -> int:
             UUID(event.get("link_id")) if event.get("link_id") else None,
             UUID(event.get("campaign_id")) if event.get("campaign_id") else None,
             UUID(event.get("store_id")) if event.get("store_id") else None,
-            UUID(event.get("user_id")) if event.get("user_id") else None,  # user_id
+            UUID(event.get("user_id")) if event.get("user_id") else None,
+            UUID(event.get("organization_id")) if event.get("organization_id") else None,
             event.get("short_code", ""),
             event.get("destination_url", ""),
             timestamp,
@@ -92,7 +93,7 @@ def insert_events_to_clickhouse(events: List[Dict[str, Any]]) -> int:
         client.execute(
             """
             INSERT INTO click_events (
-                event_id, link_id, campaign_id, store_id, user_id,
+                event_id, link_id, campaign_id, store_id, user_id, organization_id,
                 short_code, destination_url, timestamp, date,
                 ip_hash, user_agent, referrer,
                 country_code, country_name, region, city, latitude, longitude,
@@ -219,6 +220,13 @@ async def get_current_user(
         return TokenPayload(**payload)
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+
+def require_admin(user: TokenPayload = Depends(get_current_user)) -> TokenPayload:
+    """Require admin role for platform-wide analytics."""
+    if not user.roles or "admin" not in user.roles:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
 
 
 from fastapi import Query
@@ -1038,6 +1046,500 @@ async def get_realtime_stats(user: TokenPayload = Depends(get_current_user)):
             "clicks_last_5_min": 0,
             "active_links": 0,
             "recent_clicks": []
+        }
+
+
+# --- Admin analytics (platform-wide, no user_id filter) ---
+
+@app.get("/api/analytics/admin/overview")
+async def get_admin_overview(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide analytics overview (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        total_clicks = client.execute("SELECT count() FROM click_events")[0][0]
+        unique_visitors = client.execute("SELECT uniqExact(ip_hash) FROM click_events")[0][0]
+        clicks_today = client.execute(
+            "SELECT count() FROM click_events WHERE date = today()"
+        )[0][0]
+        clicks_this_week = client.execute(
+            "SELECT count() FROM click_events WHERE date >= today() - 7"
+        )[0][0]
+        clicks_this_month = client.execute(
+            "SELECT count() FROM click_events WHERE date >= today() - 30"
+        )[0][0]
+        clicks_last_week = client.execute(
+            """SELECT count() FROM click_events
+               WHERE date >= today() - 14 AND date < today() - 7"""
+        )[0][0]
+        clicks_prev_month = client.execute(
+            """SELECT count() FROM click_events
+               WHERE date >= today() - 60 AND date < today() - 30"""
+        )[0][0]
+        unique_visitors_prev = client.execute(
+            """SELECT uniqExact(ip_hash) FROM click_events
+               WHERE date >= today() - 60 AND date < today() - 30"""
+        )[0][0]
+        clicks_yesterday = client.execute(
+            "SELECT count() FROM click_events WHERE date = today() - 1"
+        )[0][0]
+
+        def calc_growth(current, previous):
+            if previous == 0:
+                return 100.0 if current > 0 else 0.0
+            return round(((current - previous) / previous) * 100, 1)
+
+        return {
+            "total_clicks": total_clicks,
+            "unique_visitors": unique_visitors,
+            "clicks_today": clicks_today,
+            "clicks_this_week": clicks_this_week,
+            "clicks_this_month": clicks_this_month,
+            "clicks_growth": calc_growth(clicks_this_week, clicks_last_week),
+            "visitors_growth": calc_growth(unique_visitors, unique_visitors_prev),
+            "today_growth": calc_growth(clicks_today, clicks_yesterday),
+        }
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return {
+            "total_clicks": 0,
+            "unique_visitors": 0,
+            "clicks_today": 0,
+            "clicks_this_week": 0,
+            "clicks_this_month": 0,
+            "clicks_growth": 0,
+            "visitors_growth": 0,
+            "today_growth": 0,
+        }
+
+
+@app.get("/api/analytics/admin/clicks-over-time")
+async def get_admin_clicks_over_time(
+    days: int = 30,
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide clicks over time (admin only)."""
+    client = get_clickhouse_client()
+    start = parse_date(start_date)
+    end = parse_date(end_date)
+    try:
+        if start and end:
+            result = client.execute(
+                """
+                SELECT date, count() as clicks, uniqExact(ip_hash) as unique_visitors
+                FROM click_events
+                WHERE date >= %(start)s AND date <= %(end)s
+                GROUP BY date
+                ORDER BY date
+                """,
+                {"start": start.date(), "end": end.date()},
+            )
+        else:
+            result = client.execute(
+                """
+                SELECT date, count() as clicks, uniqExact(ip_hash) as unique_visitors
+                FROM click_events
+                WHERE date >= today() - %(days)s
+                GROUP BY date
+                ORDER BY date
+                """,
+                {"days": days},
+            )
+        return [
+            {"date": str(row[0]), "clicks": row[1], "unique_visitors": row[2]}
+            for row in result
+        ]
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return []
+
+
+@app.get("/api/analytics/admin/top-links")
+async def get_admin_top_links(
+    limit: int = 10,
+    days: int = 30,
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide top links (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        result = client.execute(
+            """
+            SELECT
+                link_id,
+                short_code,
+                any(destination_url) as destination_url,
+                count() as clicks,
+                uniqExact(ip_hash) as unique_visitors
+            FROM click_events
+            WHERE date >= today() - %(days)s
+            GROUP BY link_id, short_code
+            ORDER BY clicks DESC
+            LIMIT %(limit)s
+            """,
+            {"limit": limit, "days": days},
+        )
+        return [
+            {
+                "link_id": str(row[0]) if row[0] else None,
+                "short_code": row[1],
+                "destination_url": row[2],
+                "clicks": row[3],
+                "unique_visitors": row[4],
+            }
+            for row in result
+        ]
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return []
+
+
+@app.get("/api/analytics/admin/devices")
+async def get_admin_devices(
+    days: int = 30,
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide device breakdown (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        result = client.execute(
+            """
+            SELECT
+                ifNull(device_type, 'unknown') as device,
+                count() as clicks,
+                round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+            FROM click_events
+            WHERE date >= today() - %(days)s
+            GROUP BY device
+            ORDER BY clicks DESC
+            """,
+            {"days": days},
+        )
+        return [
+            {"device_type": row[0], "clicks": row[1], "percentage": row[2]}
+            for row in result
+        ]
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return []
+
+
+@app.get("/api/analytics/admin/browsers")
+async def get_admin_browsers(
+    days: int = 30,
+    limit: int = 10,
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide browser breakdown (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        result = client.execute(
+            """
+            SELECT
+                ifNull(browser_name, 'unknown') as browser,
+                count() as clicks,
+                round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+            FROM click_events
+            WHERE date >= today() - %(days)s
+            GROUP BY browser
+            ORDER BY clicks DESC
+            LIMIT %(limit)s
+            """,
+            {"days": days, "limit": limit},
+        )
+        return [
+            {"browser": row[0], "clicks": row[1], "percentage": row[2]}
+            for row in result
+        ]
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return []
+
+
+@app.get("/api/analytics/admin/operating-systems")
+async def get_admin_os(
+    days: int = 30,
+    limit: int = 10,
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide OS breakdown (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        result = client.execute(
+            """
+            SELECT
+                ifNull(os_name, 'unknown') as os,
+                count() as clicks,
+                round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+            FROM click_events
+            WHERE date >= today() - %(days)s
+            GROUP BY os
+            ORDER BY clicks DESC
+            LIMIT %(limit)s
+            """,
+            {"days": days, "limit": limit},
+        )
+        return [
+            {"os": row[0], "clicks": row[1], "percentage": row[2]}
+            for row in result
+        ]
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return []
+
+
+@app.get("/api/analytics/admin/referrers")
+async def get_admin_referrers(
+    days: int = 30,
+    limit: int = 10,
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide referrer breakdown (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        result = client.execute(
+            """
+            SELECT
+                if(referrer = '' OR referrer IS NULL, 'Direct', domain(referrer)) as referrer_domain,
+                count() as clicks,
+                round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+            FROM click_events
+            WHERE date >= today() - %(days)s
+            GROUP BY referrer_domain
+            ORDER BY clicks DESC
+            LIMIT %(limit)s
+            """,
+            {"days": days, "limit": limit},
+        )
+        return [
+            {"referrer": row[0] or "Direct", "clicks": row[1], "percentage": row[2]}
+            for row in result
+        ]
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return []
+
+
+@app.get("/api/analytics/admin/countries")
+async def get_admin_countries(
+    days: int = 30,
+    limit: int = 10,
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide country breakdown (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        result = client.execute(
+            """
+            SELECT
+                ifNull(country_code, 'unknown') as country_code,
+                ifNull(country_name, 'Unknown') as country_name,
+                count() as clicks,
+                uniqExact(ip_hash) as unique_visitors,
+                round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+            FROM click_events
+            WHERE date >= today() - %(days)s
+            GROUP BY country_code, country_name
+            ORDER BY clicks DESC
+            LIMIT %(limit)s
+            """,
+            {"days": days, "limit": limit},
+        )
+        return [
+            {
+                "country_code": row[0],
+                "country_name": row[1],
+                "clicks": row[2],
+                "unique_visitors": row[3],
+                "percentage": row[4],
+            }
+            for row in result
+        ]
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return []
+
+
+@app.get("/api/analytics/admin/hourly")
+async def get_admin_hourly(
+    days: int = 7,
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide hourly click distribution (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        result = client.execute(
+            """
+            SELECT toHour(timestamp) as hour, count() as clicks
+            FROM click_events
+            WHERE date >= today() - %(days)s
+            GROUP BY hour
+            ORDER BY hour
+            """,
+            {"days": days},
+        )
+        return [{"hour": row[0], "clicks": row[1]} for row in result]
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return []
+
+
+@app.get("/api/analytics/admin/utm-sources")
+async def get_admin_utm_sources(
+    days: int = 30,
+    limit: int = 10,
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide UTM source breakdown (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        result = client.execute(
+            """
+            SELECT
+                ifNull(utm_source, 'direct') as source,
+                count() as clicks,
+                uniqExact(ip_hash) as unique_visitors,
+                round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+            FROM click_events
+            WHERE date >= today() - %(days)s
+            GROUP BY source
+            ORDER BY clicks DESC
+            LIMIT %(limit)s
+            """,
+            {"days": days, "limit": limit},
+        )
+        return [
+            {"source": row[0], "clicks": row[1], "unique_visitors": row[2], "percentage": row[3]}
+            for row in result
+        ]
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return []
+
+
+@app.get("/api/analytics/admin/utm-mediums")
+async def get_admin_utm_mediums(
+    days: int = 30,
+    limit: int = 10,
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide UTM medium breakdown (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        result = client.execute(
+            """
+            SELECT
+                ifNull(utm_medium, 'none') as medium,
+                count() as clicks,
+                uniqExact(ip_hash) as unique_visitors,
+                round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+            FROM click_events
+            WHERE date >= today() - %(days)s
+            GROUP BY medium
+            ORDER BY clicks DESC
+            LIMIT %(limit)s
+            """,
+            {"days": days, "limit": limit},
+        )
+        return [
+            {"medium": row[0], "clicks": row[1], "unique_visitors": row[2], "percentage": row[3]}
+            for row in result
+        ]
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return []
+
+
+@app.get("/api/analytics/admin/utm-campaigns")
+async def get_admin_utm_campaigns(
+    days: int = 30,
+    limit: int = 10,
+    user: TokenPayload = Depends(require_admin)
+):
+    """Platform-wide UTM campaign breakdown (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        result = client.execute(
+            """
+            SELECT
+                ifNull(utm_campaign, 'none') as campaign,
+                count() as clicks,
+                uniqExact(ip_hash) as unique_visitors,
+                round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+            FROM click_events
+            WHERE date >= today() - %(days)s
+            GROUP BY campaign
+            ORDER BY clicks DESC
+            LIMIT %(limit)s
+            """,
+            {"days": days, "limit": limit},
+        )
+        return [
+            {"campaign": row[0], "clicks": row[1], "unique_visitors": row[2], "percentage": row[3]}
+            for row in result
+        ]
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return []
+
+
+@app.get("/api/analytics/admin/realtime")
+async def get_admin_realtime(user: TokenPayload = Depends(require_admin)):
+    """Platform-wide real-time stats (admin only)."""
+    client = get_clickhouse_client()
+    try:
+        clicks_last_hour = client.execute(
+            """
+            SELECT count() FROM click_events
+            WHERE timestamp >= now() - INTERVAL 1 HOUR
+            """
+        )[0][0]
+        clicks_last_5_min = client.execute(
+            """
+            SELECT count() FROM click_events
+            WHERE timestamp >= now() - INTERVAL 5 MINUTE
+            """
+        )[0][0]
+        active_links = client.execute(
+            """
+            SELECT uniqExact(link_id) FROM click_events
+            WHERE timestamp >= now() - INTERVAL 1 HOUR
+            """
+        )[0][0]
+        recent_clicks = client.execute(
+            """
+            SELECT short_code, destination_url, timestamp
+            FROM click_events
+            WHERE timestamp >= now() - INTERVAL 1 HOUR
+            ORDER BY timestamp DESC
+            LIMIT 10
+            """
+        )
+        return {
+            "clicks_last_hour": clicks_last_hour,
+            "clicks_last_5_min": clicks_last_5_min,
+            "active_links": active_links,
+            "recent_clicks": [
+                {
+                    "short_code": row[0],
+                    "destination_url": row[1],
+                    "timestamp": row[2].isoformat() if row[2] else None,
+                }
+                for row in recent_clicks
+            ],
+        }
+    except Exception as e:
+        logger.error(f"Admin analytics query error: {e}")
+        return {
+            "clicks_last_hour": 0,
+            "clicks_last_5_min": 0,
+            "active_links": 0,
+            "recent_clicks": [],
         }
 
 

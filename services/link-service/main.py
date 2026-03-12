@@ -1,7 +1,11 @@
 """Link Service - Short link management."""
 
 import sys
-sys.path.insert(0, '/app')
+from pathlib import Path
+# Ensure service directory is in path (works in Docker /app and locally)
+_svc_dir = str(Path(__file__).resolve().parent)
+if _svc_dir not in sys.path:
+    sys.path.insert(0, _svc_dir)
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI

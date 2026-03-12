@@ -1,7 +1,7 @@
 from typing import Optional, List, Tuple
 from uuid import UUID
 
-from sqlalchemy import select, func, or_
+from sqlalchemy import select, func, or_, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -71,8 +71,11 @@ class CampaignService:
         return campaigns, total
     
     async def create(self, user_id: UUID, data: CampaignCreate) -> Campaign:
+        organization_id = await self._resolve_organization_id(user_id, data.organization_id)
+        
         campaign = Campaign(
             user_id=user_id,
+            organization_id=organization_id,
             store_id=data.store_id,
             name=data.name,
             description=data.description,
@@ -90,6 +93,9 @@ class CampaignService:
     
     async def update(self, campaign: Campaign, data: CampaignUpdate) -> Campaign:
         update_data = data.model_dump(exclude_unset=True)
+        
+        # Organization is immutable from the API surface
+        update_data.pop("organization_id", None)
         
         if 'status' in update_data and update_data['status']:
             update_data['status'] = update_data['status'].value
@@ -135,8 +141,11 @@ class StoreService:
         return list(result.scalars().all())
     
     async def create(self, user_id: UUID, data: StoreCreate) -> Store:
+        organization_id = await self._resolve_organization_id(user_id, data.organization_id)
+        
         store = Store(
             user_id=user_id,
+            organization_id=organization_id,
             name=data.name,
             description=data.description,
             location=data.location,
@@ -152,6 +161,9 @@ class StoreService:
     async def update(self, store: Store, data: StoreUpdate) -> Store:
         update_data = data.model_dump(exclude_unset=True)
         
+        # Organization is immutable from the API surface
+        update_data.pop("organization_id", None)
+        
         for key, value in update_data.items():
             setattr(store, key, value)
         
@@ -163,3 +175,37 @@ class StoreService:
     async def delete(self, store: Store) -> None:
         store.is_active = False
         await self.db.flush()
+
+    async def _resolve_organization_id(
+        self,
+        user_id: UUID,
+        requested_org_id: Optional[UUID],
+    ) -> Optional[UUID]:
+        """
+        Resolve which organization a new campaign or store should belong to.
+        
+        - If the caller passes an organization_id, ensure the user is a member.
+        - Otherwise, use the user's first organization membership (if any).
+        """
+        if requested_org_id:
+            result = await self.db.execute(
+                text(
+                    "SELECT role FROM organization_members "
+                    "WHERE organization_id = :org_id AND user_id = :user_id"
+                ),
+                {"org_id": requested_org_id, "user_id": user_id},
+            )
+            role = result.scalar_one_or_none()
+            if role is None:
+                raise ValueError("You do not belong to the specified organization")
+            return requested_org_id
+        
+        result = await self.db.execute(
+            text(
+                "SELECT organization_id FROM organization_members "
+                "WHERE user_id = :user_id "
+                "ORDER BY joined_at ASC LIMIT 1"
+            ),
+            {"user_id": user_id},
+        )
+        return result.scalar_one_or_none()

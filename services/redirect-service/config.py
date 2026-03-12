@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 from functools import lru_cache
 
 
@@ -10,12 +11,14 @@ class Settings(BaseSettings):
     
     cache_ttl: int = 300  # 5 minutes
     
+    # Simple rate limiting for redirects
+    rate_limit_window_seconds: int = 60
+    rate_limit_max_requests: int = 120
+    
     environment: str = "development"
     debug: bool = False  # Keep false for performance
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+
+    model_config = ConfigDict(extra="ignore", env_file=".env", case_sensitive=False)
 
 
 @lru_cache()

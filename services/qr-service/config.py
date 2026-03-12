@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     aws_region: str = "us-east-1"
     
     short_domain: str = "http://localhost/r"
+    app_base_url: str = ""  # Frontend base for QR file URLs (e.g. http://localhost:3000)
     
     environment: str = "development"
     debug: bool = True

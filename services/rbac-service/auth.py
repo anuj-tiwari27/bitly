@@ -2,7 +2,7 @@
 
 import hashlib
 import secrets
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from uuid import UUID
 
@@ -43,7 +43,7 @@ def create_access_token(
     if expires_delta is None:
         expires_delta = timedelta(minutes=settings.jwt_expiry_minutes)
     
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     expire = now + expires_delta
     
     payload = {
@@ -63,7 +63,7 @@ def create_refresh_token(user_id: UUID) -> tuple[str, str, datetime]:
     Create a refresh token.
     Returns (token, token_hash, expires_at).
     """
-    expires_at = datetime.utcnow() + timedelta(days=settings.jwt_refresh_expiry_days)
+    expires_at = datetime.now(timezone.utc) + timedelta(days=settings.jwt_refresh_expiry_days)
     token = secrets.token_urlsafe(32)
     token_hash = hashlib.sha256(token.encode()).hexdigest()
     

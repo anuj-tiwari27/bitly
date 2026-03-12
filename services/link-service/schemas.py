@@ -21,6 +21,7 @@ class LinkCreate(BaseSchema):
     password: Optional[str] = None
     max_clicks: Optional[int] = None
     metadata: dict = {}
+    organization_id: Optional[UUID] = None
     
     @field_validator('destination_url')
     @classmethod
@@ -40,12 +41,14 @@ class LinkUpdate(BaseSchema):
     password: Optional[str] = None
     max_clicks: Optional[int] = None
     metadata: Optional[dict] = None
+    organization_id: Optional[UUID] = None
 
 
 class LinkResponse(BaseSchema):
     id: UUID
     campaign_id: Optional[UUID] = None
     user_id: UUID
+    organization_id: Optional[UUID] = None
     short_code: str
     short_url: str
     destination_url: str

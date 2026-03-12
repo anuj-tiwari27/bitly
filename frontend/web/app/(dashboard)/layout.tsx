@@ -12,11 +12,11 @@ import {
   LogOut,
   Menu,
   X,
-  QrCode,
+  Shield,
 } from 'lucide-react'
 import { authApi } from '@/lib/api'
 
-const navigation = [
+const baseNavigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Links', href: '/dashboard/links', icon: Link2 },
   { name: 'Campaigns', href: '/dashboard/campaigns', icon: Megaphone },
@@ -65,6 +65,19 @@ export default function DashboardLayout({
       </div>
     )
   }
+
+  const isAdmin = Array.isArray(user.roles) && user.roles.includes('admin')
+  if (pathname.startsWith('/dashboard/admin') && !isAdmin) {
+    router.replace('/dashboard')
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      </div>
+    )
+  }
+  const navigation = isAdmin
+    ? [...baseNavigation, { name: 'Admin', href: '/dashboard/admin', icon: Shield }]
+    : baseNavigation
 
   return (
     <div className="min-h-screen bg-gray-50">

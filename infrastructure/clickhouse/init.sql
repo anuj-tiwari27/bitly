@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS click_events (
     campaign_id Nullable(UUID),
     store_id Nullable(UUID),
     user_id Nullable(UUID),
+    organization_id Nullable(UUID),
     short_code String,
     destination_url String,
     

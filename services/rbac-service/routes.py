@@ -1,18 +1,45 @@
 """API routes for RBAC service."""
 
 from uuid import UUID
+import json
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text
 
 from database import get_db
 from schemas import (
-    UserCreate, UserUpdate, UserResponse,
-    LoginRequest, TokenResponse, TokenRefreshRequest,
-    RoleResponse, RoleAssignment
+    UserCreate,
+    UserUpdate,
+    UserResponse,
+    LoginRequest,
+    TokenResponse,
+    TokenRefreshRequest,
+    RoleResponse,
+    RoleAssignment,
+    OrganizationCreate,
+    OrganizationUpdate,
+    OrganizationResponse,
+    OrganizationMemberResponse,
+    InvitationCreate,
+    InvitationResponse,
+    InvitationAcceptRequest,
+    AdminOverviewResponse,
+    AdminUserSummary,
+    AdminOrganizationSummary,
+    AdminUserListResponse,
+    AdminOrganizationListResponse,
+    AdminAuditLogListResponse,
 )
 from auth import get_current_user_token, require_roles, TokenPayload
-from services import UserService, TokenService, RoleService
+from services import (
+    UserService,
+    TokenService,
+    RoleService,
+    OrganizationService,
+    AdminService,
+    InvitationService,
+)
 from oauth import get_google_user_info, exchange_google_code
 from config import get_settings
 
@@ -33,6 +60,7 @@ async def register(
     """Register a new user."""
     user_service = UserService(db)
     token_service = TokenService(db)
+    org_service = OrganizationService(db)
     
     # Check if user exists
     existing = await user_service.get_by_email(data.email)
@@ -44,6 +72,33 @@ async def register(
     
     # Create user
     user = await user_service.create(data)
+    
+    # Create default organization and membership based on account_type
+    # Individual accounts get a personal org; organization accounts create a company org.
+    if data.account_type == "organization":
+        if not data.organization_name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Organization name is required for organization registration",
+            )
+        org_create = OrganizationCreate(
+            name=data.organization_name,
+            slug=None,
+            logo_url=None,
+        )
+        await org_service.create(user, org_create)
+    else:
+        # Individual account: create a simple personal organization
+        base_name_parts = [data.first_name, data.last_name]
+        base_name = " ".join(filter(None, base_name_parts)).strip()
+        if not base_name:
+            base_name = f"{data.email.split('@')[0]}'s Workspace"
+        org_create = OrganizationCreate(
+            name=base_name,
+            slug=None,
+            logo_url=None,
+        )
+        await org_service.create(user, org_create)
     
     # Generate tokens
     tokens = await token_service.create_tokens(user)
@@ -103,6 +158,80 @@ async def logout(
     await token_service.revoke_all_tokens(UUID(token.sub))
     
     return {"message": "Successfully logged out"}
+
+
+@auth_router.get("/invites/{token}", response_model=InvitationResponse)
+async def get_invitation(
+    token: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """Get details about an invitation by token."""
+    invitation_service = InvitationService(db)
+    
+    invitation = await invitation_service.get_valid_by_token(token)
+    if invitation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invitation not found or expired",
+        )
+    
+    return InvitationResponse(
+        id=invitation.id,
+        organization_id=invitation.organization_id,
+        email=invitation.email,
+        role=invitation.role,
+        status=invitation.status,
+        expires_at=invitation.expires_at,
+        created_at=invitation.created_at,
+    )
+
+
+@auth_router.post("/invites/{token}/accept", response_model=TokenResponse)
+async def accept_invitation(
+    token: str,
+    data: InvitationAcceptRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """Accept an invitation, creating a user if needed and joining the organization."""
+    invitation_service = InvitationService(db)
+    user_service = UserService(db)
+    org_service = OrganizationService(db)
+    token_service = TokenService(db)
+    
+    invitation = await invitation_service.get_valid_by_token(token)
+    if invitation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invitation not found or expired",
+        )
+    
+    # Reuse password validation rules from UserCreate
+    tmp = UserCreate(
+        email=invitation.email,
+        password=data.password,
+        first_name=data.first_name,
+        last_name=data.last_name,
+    )
+    
+    user = await user_service.get_by_email(invitation.email)
+    if user is None:
+        # Create a new user without creating a new organization
+        user = await user_service.create(tmp)
+    # If the user already exists, we do not overwrite their password here.
+    
+    # Ensure membership is created for this organization
+    org = await org_service.get_by_id(invitation.organization_id)
+    if org is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Organization not found",
+        )
+    
+    await org_service.add_member(org, user, role=invitation.role)
+    await invitation_service.mark_accepted(invitation)
+    
+    tokens = await token_service.create_tokens(user)
+    return TokenResponse(**tokens)
 
 
 @auth_router.get("/oauth/google")
@@ -413,3 +542,458 @@ async def get_role(
         permissions=role.permissions if isinstance(role.permissions, list) else [],
         created_at=role.created_at
     )
+
+
+# ===========================================
+# Organizations Router
+# ===========================================
+
+organizations_router = APIRouter()
+
+
+@organizations_router.post("", response_model=OrganizationResponse, status_code=status.HTTP_201_CREATED)
+async def create_organization(
+    data: OrganizationCreate,
+    token: TokenPayload = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db)
+):
+    """Create a new organization; current user becomes the owner."""
+    user_service = UserService(db)
+    org_service = OrganizationService(db)
+    
+    user = await user_service.get_by_id(UUID(token.sub))
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    org = await org_service.create(user, data)
+    
+    return OrganizationResponse(
+        id=org.id,
+        name=org.name,
+        slug=org.slug,
+        logo_url=org.logo_url,
+        website=org.website,
+        industry=org.industry,
+        team_size=org.team_size,
+        plan_type=org.plan_type,
+        is_active=org.is_active,
+        created_at=org.created_at,
+        members_count=1,
+    )
+
+
+@organizations_router.get("", response_model=list[OrganizationResponse])
+async def list_my_organizations(
+    token: TokenPayload = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db)
+):
+    """List organizations where the current user is a member."""
+    org_service = OrganizationService(db)
+    orgs = await org_service.list_for_user(UUID(token.sub))
+    
+    items: list[OrganizationResponse] = []
+    for org in orgs:
+        members_count_result = await db.execute(
+            text("SELECT COUNT(*) FROM organization_members WHERE organization_id = :org_id"),
+            {"org_id": org.id},
+        )
+        count_value = int(members_count_result.scalar_one() or 0)
+        items.append(
+            OrganizationResponse(
+                id=org.id,
+                name=org.name,
+                slug=org.slug,
+                logo_url=org.logo_url,
+                website=org.website,
+                industry=org.industry,
+                team_size=org.team_size,
+                plan_type=org.plan_type,
+                is_active=org.is_active,
+                created_at=org.created_at,
+                members_count=count_value,
+            )
+        )
+    return items
+
+
+async def require_org_role(
+    org_id: UUID,
+    token: TokenPayload,
+    db: AsyncSession,
+    allowed_roles: list[str] | None = None,
+) -> None:
+    """
+    Ensure the caller has one of the allowed organization roles.
+    
+    Global platform admins (JWT role \"admin\") are always allowed.
+    """
+    if "admin" in token.roles:
+        return
+    
+    if allowed_roles is None:
+        allowed_roles = ["owner", "admin", "member"]
+    
+    result = await db.execute(
+        text(
+            "SELECT role FROM organization_members "
+            "WHERE organization_id = :org_id AND user_id = :user_id"
+        ),
+        {"org_id": org_id, "user_id": UUID(token.sub)},
+    )
+    role = result.scalar_one_or_none()
+    if role is None or role not in allowed_roles:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient organization permissions",
+        )
+
+
+async def _ensure_org_member_or_admin(
+    org_id: UUID,
+    token: TokenPayload,
+    db: AsyncSession,
+) -> None:
+    """Backward-compatible helper: require the caller to be at least a member."""
+    await require_org_role(org_id, token, db, allowed_roles=["owner", "admin", "member"])
+
+
+@organizations_router.get("/{org_id}", response_model=OrganizationResponse)
+async def get_organization(
+    org_id: UUID,
+    token: TokenPayload = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get a single organization (must be member or admin)."""
+    await _ensure_org_member_or_admin(org_id, token, db)
+    
+    org_service = OrganizationService(db)
+    org = await org_service.get_by_id(org_id)
+    if org is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+    
+    members_count_result = await db.execute(
+        text("SELECT COUNT(*) FROM organization_members WHERE organization_id = :org_id"),
+        {"org_id": org.id},
+    )
+    count_value = int(members_count_result.scalar_one() or 0)
+    
+    return OrganizationResponse(
+        id=org.id,
+        name=org.name,
+        slug=org.slug,
+        logo_url=org.logo_url,
+        website=org.website,
+        industry=org.industry,
+        team_size=org.team_size,
+        plan_type=org.plan_type,
+        is_active=org.is_active,
+        created_at=org.created_at,
+        members_count=count_value,
+    )
+
+
+@organizations_router.put("/{org_id}", response_model=OrganizationResponse)
+async def update_organization(
+    org_id: UUID,
+    data: OrganizationUpdate,
+    token: TokenPayload = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db)
+):
+    """Update organization (owner or admin only)."""
+    await require_org_role(org_id, token, db, allowed_roles=["owner", "admin"])
+
+    org_service = OrganizationService(db)
+    org = await org_service.get_by_id(org_id)
+    if org is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+
+    org = await org_service.update(org, data)
+
+    members_count_result = await db.execute(
+        text("SELECT COUNT(*) FROM organization_members WHERE organization_id = :org_id"),
+        {"org_id": org.id},
+    )
+    count_value = int(members_count_result.scalar_one() or 0)
+
+    return OrganizationResponse(
+        id=org.id,
+        name=org.name,
+        slug=org.slug,
+        logo_url=org.logo_url,
+        website=org.website,
+        industry=org.industry,
+        team_size=org.team_size,
+        plan_type=org.plan_type,
+        is_active=org.is_active,
+        created_at=org.created_at,
+        members_count=count_value,
+    )
+
+
+@organizations_router.get("/{org_id}/members", response_model=list[OrganizationMemberResponse])
+async def list_organization_members(
+    org_id: UUID,
+    token: TokenPayload = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db)
+):
+    """List members of an organization."""
+    await _ensure_org_member_or_admin(org_id, token, db)
+    
+    org_service = OrganizationService(db)
+    members = await org_service.list_members(org_id)
+    
+    return [
+        OrganizationMemberResponse(
+            user_id=m.user_id,
+            email=m.user.email,
+            role=m.role,
+            joined_at=m.joined_at,
+        )
+        for m in members
+    ]
+
+
+@organizations_router.post("/{org_id}/invite", response_model=OrganizationMemberResponse)
+async def invite_member_to_organization(
+    org_id: UUID,
+    data: InvitationCreate,
+    token: TokenPayload = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db)
+):
+    """Create an invitation for a user to join an organization."""
+    # Only org owners and admins (or platform admins) can invite new members
+    await require_org_role(org_id, token, db, allowed_roles=["owner", "admin"])
+    
+    org_service = OrganizationService(db)
+    invitation_service = InvitationService(db)
+    
+    org = await org_service.get_by_id(org_id)
+    if org is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Organization not found",
+        )
+    
+    role = data.role or "member"
+    if role not in {"admin", "member"}:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Role must be 'admin' or 'member'",
+        )
+    
+    invitation = await invitation_service.create_invitation(
+        organization=org,
+        email=data.email,
+        role=role,
+    )
+    
+    # TODO: plug in real email delivery; for now this is handled out-of-band.
+    
+    return InvitationResponse(
+        id=invitation.id,
+        organization_id=invitation.organization_id,
+        email=invitation.email,
+        role=invitation.role,
+        status=invitation.status,
+        expires_at=invitation.expires_at,
+        created_at=invitation.created_at,
+    )
+
+
+@organizations_router.delete("/{org_id}/members/{user_id}")
+async def remove_member_from_organization(
+    org_id: UUID,
+    user_id: UUID,
+    token: TokenPayload = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db)
+):
+    """Remove a member from an organization."""
+    # Only org owners and admins (or platform admins) can remove members
+    await require_org_role(org_id, token, db, allowed_roles=["owner", "admin"])
+    
+    org_service = OrganizationService(db)
+    success = await org_service.remove_member(org_id, user_id)
+    if not success:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membership not found")
+    
+    return {"detail": "Member removed"}
+
+
+# ===========================================
+# Admin Router
+# ===========================================
+
+admin_router = APIRouter()
+
+
+@admin_router.get("/overview", response_model=AdminOverviewResponse)
+async def admin_overview(
+    token: TokenPayload = Depends(require_roles("admin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """Platform-wide overview stats (admin only)."""
+    admin_service = AdminService(db)
+    return await admin_service.get_overview()
+
+
+@admin_router.get("/users", response_model=AdminUserListResponse)
+async def admin_list_users(
+    page: int = 1,
+    page_size: int = 20,
+    token: TokenPayload = Depends(require_roles("admin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """List users with aggregate stats (admin only)."""
+    admin_service = AdminService(db)
+    items, total = await admin_service.list_users(page=page, page_size=page_size)
+    return AdminUserListResponse(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
+
+
+@admin_router.get("/organizations", response_model=AdminOrganizationListResponse)
+async def admin_list_organizations(
+    page: int = 1,
+    page_size: int = 20,
+    token: TokenPayload = Depends(require_roles("admin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """List organizations with aggregate stats (admin only)."""
+    admin_service = AdminService(db)
+    items, total = await admin_service.list_organizations(page=page, page_size=page_size)
+    return AdminOrganizationListResponse(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
+
+
+@admin_router.get("/audit-logs", response_model=AdminAuditLogListResponse)
+async def admin_audit_logs(
+    page: int = 1,
+    page_size: int = 50,
+    token: TokenPayload = Depends(require_roles("admin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """List admin audit log entries."""
+    admin_service = AdminService(db)
+    items, total = await admin_service.list_audit_logs(page=page, page_size=page_size)
+    return AdminAuditLogListResponse(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
+
+
+@admin_router.post("/organizations/{org_id}/suspend")
+async def admin_suspend_organization(
+    org_id: UUID,
+    token: TokenPayload = Depends(require_roles("admin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """Suspend an organization (admin only)."""
+    org_service = OrganizationService(db)
+    org = await org_service.get_by_id(org_id)
+    if org is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Organization not found",
+        )
+    org.status = "suspended"
+    org.is_active = False
+    await db.flush()
+    await _log_admin_action(
+        db,
+        admin_user_id=UUID(token.sub),
+        organization_id=org_id,
+        action="admin.suspend_organization",
+        details={"previous_status": org.status},
+    )
+    return {"detail": "Organization suspended"}
+
+
+@admin_router.post("/organizations/{org_id}/activate")
+async def admin_activate_organization(
+    org_id: UUID,
+    token: TokenPayload = Depends(require_roles("admin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """Activate a suspended organization (admin only)."""
+    org_service = OrganizationService(db)
+    org = await org_service.get_by_id(org_id)
+    if org is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Organization not found",
+        )
+    org.status = "active"
+    org.is_active = True
+    await db.flush()
+    await _log_admin_action(
+        db,
+        admin_user_id=UUID(token.sub),
+        organization_id=org_id,
+        action="admin.activate_organization",
+        details={},
+    )
+    return {"detail": "Organization activated"}
+
+
+@admin_router.delete("/organizations/{org_id}")
+async def admin_delete_organization(
+    org_id: UUID,
+    token: TokenPayload = Depends(require_roles("admin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Soft-delete an organization (admin only).
+    
+    Data is retained, but the organization is marked deleted and deactivated.
+    """
+    org_service = OrganizationService(db)
+    org = await org_service.get_by_id(org_id)
+    if org is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Organization not found",
+        )
+    org.status = "deleted"
+    org.is_active = False
+    await db.flush()
+    await _log_admin_action(
+        db,
+        admin_user_id=UUID(token.sub),
+        organization_id=org_id,
+        action="admin.delete_organization",
+        details={"reason": "soft_delete"},
+    )
+    return {"detail": "Organization deleted"}
+
+
+async def _log_admin_action(
+    db: AsyncSession,
+    admin_user_id: UUID,
+    action: str,
+    organization_id: UUID | None = None,
+    details: dict | None = None,
+) -> None:
+    """Write an entry to the admin audit log table."""
+    payload = json.dumps(details or {})
+    await db.execute(
+        text(
+            "INSERT INTO admin_audit_logs (admin_user_id, organization_id, action, details) "
+            "VALUES (:admin_user_id, :organization_id, :action, :details)"
+        ),
+        {
+            "admin_user_id": admin_user_id,
+            "organization_id": organization_id,
+            "action": action,
+            "details": payload,
+        },
+    )
+    await db.flush()

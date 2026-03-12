@@ -63,6 +63,13 @@ export default function NewLinkPage() {
     if (formData.password) data.password = formData.password
     if (formData.max_clicks) data.max_clicks = parseInt(formData.max_clicks)
 
+    if (typeof window !== 'undefined') {
+      const orgId = localStorage.getItem('current_organization_id')
+      if (orgId) {
+        data.organization_id = orgId
+      }
+    }
+
     createMutation.mutate(data)
   }
 

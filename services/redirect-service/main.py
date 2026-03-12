@@ -113,7 +113,7 @@ async def get_link_from_db(short_code: str) -> Optional[dict]:
                 SELECT 
                     l.id, l.destination_url, l.is_active, l.expires_at, 
                     l.password_hash, l.max_clicks, l.click_count,
-                    l.campaign_id, l.user_id
+                    l.campaign_id, l.user_id, l.organization_id
                 FROM links l
                 WHERE l.short_code = :short_code
             """),
@@ -132,6 +132,7 @@ async def get_link_from_db(short_code: str) -> Optional[dict]:
                 "click_count": row[6],
                 "campaign_id": str(row[7]) if row[7] else None,
                 "user_id": str(row[8]) if row[8] else None,
+                "organization_id": str(row[9]) if row[9] else None,
             }
     return None
 
@@ -187,6 +188,7 @@ async def emit_click_event(
             "campaign_id": link_data.get("campaign_id"),
             "store_id": None,
             "user_id": link_data.get("user_id"),
+            "organization_id": link_data.get("organization_id"),
             "short_code": short_code,
             "destination_url": link_data["destination_url"],
             "timestamp": datetime.utcnow().isoformat(),
@@ -230,6 +232,13 @@ async def redirect(short_code: str, request: Request):
     4. Return 302 redirect
     5. Async: emit click event
     """
+    client_ip = request.headers.get("X-Forwarded-For", request.client.host)
+    if "," in client_ip:
+        client_ip = client_ip.split(",")[0].strip()
+    
+    # Basic rate limiting per IP and short code
+    await enforce_rate_limit(client_ip, short_code)
+    
     link_data = await get_link_from_cache(short_code)
     
     if link_data is None:
@@ -284,13 +293,41 @@ async def redirect(short_code: str, request: Request):
         )
     
     asyncio.create_task(increment_click_count(link_data["id"]))
-    
     await emit_click_event(link_data, short_code, request)
     
     return RedirectResponse(
         url=link_data["destination_url"],
         status_code=status.HTTP_302_FOUND
     )
+
+
+async def enforce_rate_limit(ip: str, short_code: str) -> None:
+    """
+    Simple fixed-window rate limit using Redis.
+    
+    Limits requests per (ip, short_code) pair to avoid abuse.
+    """
+    if redis_client is None:
+        return
+    
+    try:
+        window = settings.rate_limit_window_seconds
+        max_requests = settings.rate_limit_max_requests
+        key = f"rl:{short_code}:{ip}"
+        
+        current = await redis_client.incr(key)
+        if current == 1:
+            await redis_client.expire(key, window)
+        
+        if current > max_requests:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Too many requests. Please try again later.",
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Rate limit error: {e}")
 
 
 @app.post("/r/{short_code}/verify")

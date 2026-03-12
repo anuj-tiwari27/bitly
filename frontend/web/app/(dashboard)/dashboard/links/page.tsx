@@ -5,19 +5,26 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import {
   Link2, Plus, Search, Copy, ExternalLink, QrCode, Trash2,
-  MoreHorizontal, Check, Calendar, MousePointerClick
+  Check, Calendar, MousePointerClick, FileUp
 } from 'lucide-react'
 import { linksApi } from '@/lib/api'
 import { formatNumber, formatDate, truncateUrl, copyToClipboard } from '@/lib/utils'
 
+type Tab = 'links' | 'documents'
+
+function isDocumentLink(link: { destination_url?: string }) {
+  return link?.destination_url?.includes('/api/documents/') ?? false
+}
+
 export default function LinksPage() {
   const queryClient = useQueryClient()
+  const [activeTab, setActiveTab] = useState<Tab>('links')
   const [search, setSearch] = useState('')
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['links', { search }],
-    queryFn: () => linksApi.list({ search: search || undefined, page_size: 50 }),
+    queryFn: () => linksApi.list({ search: search || undefined, page_size: 100 }),
   })
 
   const deleteMutation = useMutation({
@@ -25,7 +32,11 @@ export default function LinksPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['links'] }),
   })
 
-  const links = data?.data?.items || []
+  const allLinks = data?.data?.items || []
+  const documentLinks = allLinks.filter(isDocumentLink)
+  const urlLinks = allLinks.filter((l: any) => !isDocumentLink(l))
+
+  const links = activeTab === 'documents' ? documentLinks : urlLinks
 
   const handleCopy = async (url: string, id: string) => {
     await copyToClipboard(url)
@@ -38,15 +49,70 @@ export default function LinksPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Links</h1>
-          <p className="text-gray-600 mt-1">Manage all your short links</p>
+          <p className="text-gray-600 mt-1">Manage short links and document shares</p>
         </div>
-        <Link
-          href="/dashboard/links/new"
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Create Link
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/dashboard/links/upload-document"
+            className={`flex items-center px-4 py-2 rounded-lg transition ${
+              activeTab === 'documents'
+                ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                : 'border border-indigo-600 text-indigo-600 hover:bg-indigo-50'
+            }`}
+          >
+            <FileUp className="h-4 w-4 mr-2" />
+            Upload Document
+          </Link>
+          <Link
+            href="/dashboard/links/new"
+            className={`flex items-center px-4 py-2 rounded-lg transition ${
+              activeTab === 'links'
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Link
+          </Link>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="flex gap-8">
+          <button
+            onClick={() => setActiveTab('links')}
+            className={`pb-4 px-1 border-b-2 font-medium text-sm transition ${
+              activeTab === 'links'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <Link2 className="h-4 w-4" />
+              Links
+              <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">
+                {urlLinks.length}
+              </span>
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveTab('documents')}
+            className={`pb-4 px-1 border-b-2 font-medium text-sm transition ${
+              activeTab === 'documents'
+                ? 'border-indigo-600 text-indigo-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <FileUp className="h-4 w-4" />
+              Documents
+              <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">
+                {documentLinks.length}
+              </span>
+            </span>
+          </button>
+        </nav>
       </div>
 
       {/* Search */}
@@ -56,12 +122,12 @@ export default function LinksPage() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search links..."
+          placeholder={activeTab === 'documents' ? 'Search documents...' : 'Search links...'}
           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
-      {/* Links Table */}
+      {/* Links / Documents Table */}
       <div className="bg-white rounded-xl border overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center">
@@ -69,16 +135,33 @@ export default function LinksPage() {
           </div>
         ) : links.length === 0 ? (
           <div className="p-12 text-center">
-            <Link2 className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No links yet</h3>
-            <p className="text-gray-500 mb-4">Create your first short link to get started</p>
-            <Link
-              href="/dashboard/links/new"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Link
-            </Link>
+            {activeTab === 'documents' ? (
+              <>
+                <FileUp className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No documents yet</h3>
+                <p className="text-gray-500 mb-4">Upload a document to get a short link and QR code</p>
+                <Link
+                  href="/dashboard/links/upload-document"
+                  className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                >
+                  <FileUp className="h-4 w-4 mr-2" />
+                  Upload Document
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link2 className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No links yet</h3>
+                <p className="text-gray-500 mb-4">Create your first short link to get started</p>
+                <Link
+                  href="/dashboard/links/new"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Link
+                </Link>
+              </>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -86,7 +169,7 @@ export default function LinksPage() {
               <thead className="bg-gray-50 border-b">
                 <tr>
                   <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Link
+                    {activeTab === 'documents' ? 'Document' : 'Link'}
                   </th>
                   <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Short URL

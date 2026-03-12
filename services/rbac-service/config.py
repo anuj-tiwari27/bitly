@@ -1,13 +1,15 @@
 """RBAC Service configuration."""
 
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 from functools import lru_cache
 from typing import Optional
 
 
 class Settings(BaseSettings):
     """Settings for RBAC service."""
-    
+    model_config = ConfigDict(extra="ignore", env_file=".env", case_sensitive=False)
+
     # Database
     database_url: str = "postgresql+asyncpg://bitly:bitly_secret@postgres:5432/bitly"
     
@@ -28,10 +30,7 @@ class Settings(BaseSettings):
     # App
     environment: str = "development"
     debug: bool = True
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+    seed_admin_email: Optional[str] = None  # If set, assign admin role to this user on startup
 
 
 @lru_cache()

@@ -7,6 +7,7 @@ const SERVICES = {
   qr: process.env.QR_SERVICE_URL || 'http://qr-service:8000',
   redirect: process.env.REDIRECT_SERVICE_URL || 'http://redirect-service:8000',
   analytics: process.env.ANALYTICS_SERVICE_URL || 'http://analytics-processor:8000',
+  document: process.env.DOCUMENT_SERVICE_URL || 'http://document-service:8000',
 }
 
 export async function proxyRequest(
@@ -41,6 +42,44 @@ export async function proxyRequest(
     const response = await fetch(url, fetchOptions)
     const data = await response.text()
 
+    return new NextResponse(data, {
+      status: response.status,
+      headers: {
+        'Content-Type': response.headers.get('Content-Type') || 'application/json',
+      },
+    })
+  } catch (error) {
+    console.error(`Proxy error to ${url}:`, error)
+    return NextResponse.json(
+      { error: 'Service unavailable' },
+      { status: 503 }
+    )
+  }
+}
+
+/** Proxy for multipart/form-data (e.g. file uploads) - forwards raw request. */
+export async function proxyMultipartRequest(
+  request: NextRequest,
+  service: keyof typeof SERVICES,
+  path: string
+): Promise<NextResponse> {
+  const url = `${SERVICES[service]}/api${path}`
+
+  const headers: Record<string, string> = {}
+  request.headers.forEach((value, key) => {
+    if (!['host', 'content-length'].includes(key.toLowerCase())) {
+      headers[key] = value
+    }
+  })
+
+  try {
+    const body = await request.arrayBuffer()
+    const response = await fetch(url, {
+      method: request.method,
+      headers,
+      body: body.byteLength > 0 ? body : undefined,
+    })
+    const data = await response.text()
     return new NextResponse(data, {
       status: response.status,
       headers: {

@@ -59,6 +59,13 @@ export default function NewCampaignPage() {
     if (formData.start_date) data.start_date = formData.start_date
     if (formData.end_date) data.end_date = formData.end_date
 
+    if (typeof window !== 'undefined') {
+      const orgId = localStorage.getItem('current_organization_id')
+      if (orgId) {
+        data.organization_id = orgId
+      }
+    }
+
     createMutation.mutate(data)
   }
 

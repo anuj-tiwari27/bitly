@@ -1,7 +1,7 @@
 """Pydantic schemas for RBAC service."""
 
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Literal
 from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
@@ -20,6 +20,13 @@ class UserCreate(BaseSchema):
     password: str = Field(..., min_length=8)
     first_name: Optional[str] = None
     last_name: Optional[str] = None
+    # Account / organization context
+    account_type: Literal["individual", "organization"] = "individual"
+    # Only used when account_type == "organization"
+    organization_name: Optional[str] = None
+    organization_website: Optional[str] = None
+    organization_industry: Optional[str] = None
+    organization_team_size: Optional[str] = None
     
     @field_validator('password')
     @classmethod
@@ -95,6 +102,134 @@ class RoleResponse(BaseSchema):
 
 class RoleAssignment(BaseSchema):
     role_id: UUID
+
+
+# ===========================================
+# Organization Schemas
+# ===========================================
+
+class OrganizationCreate(BaseSchema):
+    name: str
+    slug: Optional[str] = None
+    logo_url: Optional[str] = None
+
+
+class OrganizationUpdate(BaseSchema):
+    name: Optional[str] = None
+    slug: Optional[str] = None
+    logo_url: Optional[str] = None
+    website: Optional[str] = None
+    industry: Optional[str] = None
+    team_size: Optional[str] = None
+
+
+class OrganizationMemberResponse(BaseSchema):
+    user_id: UUID
+    email: str
+    role: str
+    joined_at: datetime
+
+
+class OrganizationResponse(BaseSchema):
+    id: UUID
+    name: str
+    slug: str
+    logo_url: Optional[str] = None
+    website: Optional[str] = None
+    industry: Optional[str] = None
+    team_size: Optional[str] = None
+    plan_type: str
+    is_active: bool
+    created_at: datetime
+    members_count: int = 0
+
+
+class InvitationCreate(BaseSchema):
+    email: EmailStr
+    role: str = "member"
+
+
+class InvitationResponse(BaseSchema):
+    id: UUID
+    organization_id: UUID
+    email: str
+    role: str
+    status: str
+    expires_at: datetime
+    created_at: datetime
+
+
+class InvitationAcceptRequest(BaseSchema):
+    password: str = Field(..., min_length=8)
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+
+
+# ===========================================
+# Admin Schemas
+# ===========================================
+
+class AdminOverviewResponse(BaseSchema):
+    total_users: int
+    total_organizations: int
+    total_links: int
+    total_campaigns: int
+    total_qr_codes: int
+    total_clicks: int
+
+
+class AdminUserSummary(BaseSchema):
+    id: UUID
+    email: str
+    created_at: datetime
+    campaign_count: int
+    link_count: int
+    qr_count: int
+    total_clicks: int
+
+
+class AdminOrganizationSummary(BaseSchema):
+    id: UUID
+    name: str
+    slug: str
+    plan_type: str
+    is_active: bool
+    status: str
+    created_at: datetime
+    members_count: int
+    link_count: int
+    qr_count: int
+    total_clicks: int
+
+
+class AdminUserListResponse(BaseSchema):
+    items: List[AdminUserSummary]
+    total: int
+    page: int
+    page_size: int
+
+
+class AdminOrganizationListResponse(BaseSchema):
+    items: List[AdminOrganizationSummary]
+    total: int
+    page: int
+    page_size: int
+
+
+class AdminAuditLogEntry(BaseSchema):
+    id: UUID
+    admin_user_id: UUID
+    organization_id: Optional[UUID] = None
+    action: str
+    details: dict
+    created_at: datetime
+
+
+class AdminAuditLogListResponse(BaseSchema):
+    items: List[AdminAuditLogEntry]
+    total: int
+    page: int
+    page_size: int
 
 
 # ===========================================

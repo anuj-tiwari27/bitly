@@ -16,7 +16,12 @@ class LocalStorageClient:
     def __init__(self):
         self.base_path = Path("/app/qr-storage")
         self.base_path.mkdir(parents=True, exist_ok=True)
-        self.base_url = settings.short_domain.replace("/r", "") + "/qr-files"
+        # Use app_base_url if set; when localhost, use :3000 (frontend); else derive from short_domain
+        base = settings.app_base_url
+        if not base:
+            short_base = settings.short_domain.replace("/r", "").rstrip("/")
+            base = "http://localhost:3000" if "localhost" in short_base else short_base
+        self.base_url = (base or "").rstrip("/") + "/qr-files"
     
     async def upload_file(
         self,

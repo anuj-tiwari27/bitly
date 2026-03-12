@@ -30,6 +30,7 @@ def link_to_response(link) -> LinkResponse:
         id=link.id,
         campaign_id=link.campaign_id,
         user_id=link.user_id,
+        organization_id=getattr(link, "organization_id", None),
         short_code=link.short_code,
         short_url=make_short_url(link.short_code),
         destination_url=link.destination_url,

@@ -19,6 +19,7 @@ def campaign_to_response(campaign, include_links: bool = False):
     response_data = {
         "id": campaign.id,
         "user_id": campaign.user_id,
+        "organization_id": getattr(campaign, "organization_id", None),
         "store_id": campaign.store_id,
         "name": campaign.name,
         "description": campaign.description,
@@ -172,6 +173,7 @@ async def create_store(
     return StoreResponse(
         id=store.id,
         user_id=store.user_id,
+        organization_id=getattr(store, "organization_id", None),
         name=store.name,
         description=store.description,
         location=store.location,
@@ -194,6 +196,7 @@ async def list_stores(
         StoreResponse(
             id=store.id,
             user_id=store.user_id,
+            organization_id=getattr(store, "organization_id", None),
             name=store.name,
             description=store.description,
             location=store.location,
@@ -225,6 +228,7 @@ async def get_store(
     return StoreResponse(
         id=store.id,
         user_id=store.user_id,
+        organization_id=getattr(store, "organization_id", None),
         name=store.name,
         description=store.description,
         location=store.location,
@@ -257,6 +261,7 @@ async def update_store(
     return StoreResponse(
         id=store.id,
         user_id=store.user_id,
+        organization_id=getattr(store, "organization_id", None),
         name=store.name,
         description=store.description,
         location=store.location,

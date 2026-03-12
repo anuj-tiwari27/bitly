@@ -26,6 +26,7 @@ class CampaignCreate(BaseSchema):
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     metadata: dict = {}
+    organization_id: Optional[UUID] = None
 
 
 class CampaignUpdate(BaseSchema):
@@ -36,6 +37,7 @@ class CampaignUpdate(BaseSchema):
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     metadata: Optional[dict] = None
+    organization_id: Optional[UUID] = None
 
 
 class LinkSummary(BaseSchema):
@@ -51,6 +53,7 @@ class LinkSummary(BaseSchema):
 class CampaignResponse(BaseSchema):
     id: UUID
     user_id: UUID
+    organization_id: Optional[UUID] = None
     store_id: Optional[UUID] = None
     name: str
     description: Optional[str] = None
@@ -81,6 +84,7 @@ class StoreCreate(BaseSchema):
     description: Optional[str] = None
     location: Optional[str] = None
     metadata: dict = {}
+    organization_id: Optional[UUID] = None
 
 
 class StoreUpdate(BaseSchema):
@@ -89,11 +93,13 @@ class StoreUpdate(BaseSchema):
     location: Optional[str] = None
     metadata: Optional[dict] = None
     is_active: Optional[bool] = None
+    organization_id: Optional[UUID] = None
 
 
 class StoreResponse(BaseSchema):
     id: UUID
     user_id: UUID
+    organization_id: Optional[UUID] = None
     name: str
     description: Optional[str] = None
     location: Optional[str] = None

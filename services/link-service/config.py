@@ -1,11 +1,14 @@
 """Link Service configuration."""
 
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 from functools import lru_cache
 from typing import Optional
 
 
 class Settings(BaseSettings):
+    model_config = ConfigDict(extra="ignore", env_file=".env", case_sensitive=False)
+
     database_url: str = "postgresql+asyncpg://bitly:bitly_secret@postgres:5432/bitly"
     redis_url: str = "redis://redis:6379/0"
     
@@ -23,10 +26,6 @@ class Settings(BaseSettings):
     
     environment: str = "development"
     debug: bool = True
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
 
 
 @lru_cache()

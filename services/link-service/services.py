@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional, List, Tuple
 from uuid import UUID
 
-from sqlalchemy import select, func, and_, or_
+from sqlalchemy import select, func, and_, or_, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from passlib.context import CryptContext
@@ -126,9 +126,13 @@ class LinkService:
         if data.password:
             password_hash = hash_password(data.password)
         
+        # Resolve organization scoping: ensure the user belongs to the organization
+        organization_id = await self._resolve_organization_id(user_id, data.organization_id)
+        
         link = Link(
             user_id=user_id,
             campaign_id=data.campaign_id,
+            organization_id=organization_id,
             short_code=short_code,
             destination_url=data.destination_url,
             title=data.title,
@@ -148,6 +152,9 @@ class LinkService:
     async def update(self, link: Link, data: LinkUpdate) -> Link:
         """Update a link."""
         update_data = data.model_dump(exclude_unset=True)
+        
+        # Organization is immutable from the API surface
+        update_data.pop("organization_id", None)
         
         # Handle password separately
         if 'password' in update_data:
@@ -196,6 +203,41 @@ class LinkService:
                 return code
         
         raise ValueError("Failed to generate unique short code")
+
+    async def _resolve_organization_id(
+        self,
+        user_id: UUID,
+        requested_org_id: Optional[UUID],
+    ) -> Optional[UUID]:
+        """
+        Resolve which organization a new link should belong to.
+        
+        - If the caller passes an organization_id, ensure the user is a member.
+        - Otherwise, fall back to the user's first organization membership (if any).
+        """
+        if requested_org_id:
+            result = await self.db.execute(
+                text(
+                    "SELECT role FROM organization_members "
+                    "WHERE organization_id = :org_id AND user_id = :user_id"
+                ),
+                {"org_id": requested_org_id, "user_id": user_id},
+            )
+            role = result.scalar_one_or_none()
+            if role is None:
+                raise ValueError("You do not belong to the specified organization")
+            return requested_org_id
+        
+        # Default: first organization the user belongs to, if any
+        result = await self.db.execute(
+            text(
+                "SELECT organization_id FROM organization_members "
+                "WHERE user_id = :user_id "
+                "ORDER BY joined_at ASC LIMIT 1"
+            ),
+            {"user_id": user_id},
+        )
+        return result.scalar_one_or_none()
 
 
 class TagService:
