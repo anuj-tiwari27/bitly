@@ -128,6 +128,7 @@ export default function DashboardLayout({
                 <Link
                   key={item.name}
                   href={item.href}
+                  onClick={() => setSidebarOpen(false)}
                   className={`flex items-center px-4 py-3 rounded-lg text-sm transition ${
                     isActive
                       ? 'bg-slate-900 text-primary'
