@@ -70,7 +70,7 @@ export default function CampaignsPage() {
           <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
         </div>
       ) : campaigns.length === 0 ? (
-        <div className="rounded-xl border bg-card p-12 text-center text-card-foreground">
+        <div className="glass-card rounded-xl p-12 text-center text-card-foreground">
           <Megaphone className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
           <h3 className="mb-2 text-lg font-medium">No campaigns yet</h3>
           <p className="mb-4 text-sm text-muted-foreground">
@@ -89,7 +89,7 @@ export default function CampaignsPage() {
           {campaigns.map((campaign: any) => (
             <div
               key={campaign.id}
-              className="rounded-xl border bg-card text-card-foreground transition hover:shadow-md"
+              className="glass-card rounded-xl text-card-foreground transition hover:shadow-lg"
             >
               <div className="p-6">
                 <div className="mb-4 flex items-start justify-between">

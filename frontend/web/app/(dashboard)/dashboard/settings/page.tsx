@@ -51,7 +51,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Profile Section */}
-      <div className="mb-6 rounded-xl border bg-card p-6 text-card-foreground">
+      <div className="glass-card mb-6 rounded-xl p-6 text-card-foreground">
         <div className="flex items-center space-x-3 mb-6">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
             <User className="h-5 w-5 text-primary" />
@@ -121,7 +121,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Account Info */}
-      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+      <div className="glass-card rounded-xl p-6 text-card-foreground">
         <h2 className="mb-4 text-lg font-semibold">Account Information</h2>
         <dl className="space-y-4">
           <div className="flex justify-between">
@@ -244,7 +244,7 @@ function OrganizationSettingsSection({ queryClient }: { queryClient: ReturnType<
   }
 
   return (
-    <div className="mb-6 rounded-xl border bg-card p-6 text-card-foreground">
+    <div className="glass-card mb-6 rounded-xl p-6 text-card-foreground">
       <div className="flex items-center space-x-3 mb-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
           <Building2 className="h-5 w-5 text-amber-400" />
@@ -383,7 +383,7 @@ function AdminRoleSettingsSection({ queryClient }: { queryClient: ReturnType<typ
   const roles = Array.isArray(rolesData) ? rolesData : (rolesData as any)?.data || []
 
   return (
-    <div className="rounded-xl border bg-card p-6 text-card-foreground">
+    <div className="glass-card rounded-xl p-6 text-card-foreground">
       <div className="flex items-center space-x-3 mb-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800">
           <Shield className="h-5 w-5 text-slate-200" />

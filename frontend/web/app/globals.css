@@ -58,3 +58,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .glass-card {
+    @apply bg-slate-900/70 border border-slate-700/70 backdrop-blur-xl shadow-[0_18px_60px_rgba(0,0,0,0.65)];
+  }
+}

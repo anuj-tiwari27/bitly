@@ -80,7 +80,7 @@ export default function DashboardPage() {
         {stats.map((stat) => (
           <div
             key={stat.name}
-            className="rounded-xl border bg-card p-6 text-card-foreground hover:shadow-md transition"
+            className="glass-card rounded-xl p-6 text-card-foreground transition"
           >
             <div className="flex items-center justify-between">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
@@ -107,8 +107,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Links */}
-      <div className="rounded-xl border bg-card">
-        <div className="flex items-center justify-between border-b border-border p-6">
+      <div className="glass-card rounded-xl">
+        <div className="flex items-center justify-between border-b border-slate-700/60 p-6">
           <h2 className="text-lg font-semibold text-card-foreground">Recent Links</h2>
           <Link
             href="/dashboard/links"
@@ -117,7 +117,7 @@ export default function DashboardPage() {
             View all
           </Link>
         </div>
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-slate-800/70">
           {links.length === 0 ? (
             <div className="p-8 text-center">
               <Link2 className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
@@ -169,7 +169,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Link
           href="/dashboard/links/new"
-          className="rounded-xl bg-primary p-6 text-primary-foreground transition hover:opacity-90"
+          className="glass-card rounded-xl border-0 bg-primary/90 p-6 text-primary-foreground transition hover:opacity-95"
         >
           <Link2 className="h-8 w-8 mb-4" />
           <h3 className="text-lg font-semibold">Create Link</h3>
@@ -179,7 +179,7 @@ export default function DashboardPage() {
         </Link>
         <Link
           href="/dashboard/campaigns/new"
-          className="rounded-xl border bg-card p-6 text-card-foreground hover:shadow-md transition"
+          className="glass-card rounded-xl p-6 text-card-foreground transition hover:shadow-md"
         >
           <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-lg bg-secondary/10">
             <span className="text-lg text-secondary-foreground">📢</span>
@@ -191,7 +191,7 @@ export default function DashboardPage() {
         </Link>
         <Link
           href="/dashboard/analytics"
-          className="rounded-xl border bg-card p-6 text-card-foreground hover:shadow-md transition"
+          className="glass-card rounded-xl p-6 text-card-foreground transition hover:shadow-md"
         >
           <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
             <span className="text-lg text-emerald-400">📊</span>

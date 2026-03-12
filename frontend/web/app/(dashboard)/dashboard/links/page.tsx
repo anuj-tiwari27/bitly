@@ -147,7 +147,7 @@ export default function LinksPage() {
       </div>
 
       {/* Links / Documents Table */}
-      <div className="overflow-hidden rounded-xl border bg-card text-card-foreground">
+      <div className="glass-card overflow-hidden rounded-xl text-card-foreground">
         {isLoading ? (
           <div className="p-8 text-center">
             <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />

@@ -171,7 +171,7 @@ export default function AnalyticsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="rounded-xl border bg-card p-4 text-card-foreground">
+        <div className="glass-card rounded-xl p-4 text-card-foreground">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
               <MousePointerClick className="h-5 w-5 text-primary" />
@@ -183,7 +183,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border bg-card p-4 text-card-foreground">
+        <div className="glass-card rounded-xl p-4 text-card-foreground">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
               <Users className="h-5 w-5 text-emerald-400" />
@@ -195,7 +195,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border bg-card p-4 text-card-foreground">
+        <div className="glass-card rounded-xl p-4 text-card-foreground">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
               <TrendingUp className="h-5 w-5 text-amber-400" />
@@ -207,7 +207,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border bg-card p-4 text-card-foreground">
+        <div className="glass-card rounded-xl p-4 text-card-foreground">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/10">
               <Calendar className="h-5 w-5 text-secondary" />
@@ -219,7 +219,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border bg-card p-4 text-card-foreground">
+        <div className="glass-card rounded-xl p-4 text-card-foreground">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-fuchsia-500/10">
               <BarChart3 className="h-5 w-5 text-fuchsia-400" />
@@ -233,7 +233,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Clicks Over Time Chart */}
-      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+      <div className="glass-card rounded-xl p-6 text-card-foreground">
         <h2 className="mb-6 text-lg font-semibold">Clicks Over Time</h2>
         <div className="h-80">
           {clicksData.length > 0 ? (
@@ -293,7 +293,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Hourly Distribution */}
-      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+      <div className="glass-card rounded-xl p-6 text-card-foreground">
         <div className="mb-6 flex items-center gap-2">
           <Clock className="h-5 w-5 text-muted-foreground" />
           <h2 className="text-lg font-semibold">Hourly Click Distribution</h2>
@@ -328,7 +328,7 @@ export default function AnalyticsPage() {
       {/* Device & Browser Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Devices */}
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h2 className="mb-4 text-lg font-semibold">Devices</h2>
           {devicesData.length > 0 ? (
             <div className="space-y-3">
@@ -366,7 +366,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Browsers */}
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h2 className="mb-4 text-lg font-semibold">Browsers</h2>
           {browsersData.length > 0 ? (
             <div className="space-y-3">
@@ -398,7 +398,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Operating Systems */}
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h2 className="mb-4 text-lg font-semibold">Operating Systems</h2>
           {osData.length > 0 ? (
             <div className="space-y-3">
@@ -431,7 +431,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* UTM Analytics Section */}
-      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+      <div className="glass-card rounded-xl p-6 text-card-foreground">
         <div className="mb-6 flex items-center gap-2">
           <Share2 className="h-5 w-5 text-muted-foreground" />
           <h2 className="text-lg font-semibold">UTM Campaign Tracking</h2>
@@ -505,7 +505,7 @@ export default function AnalyticsPage() {
       {/* Countries & Referrers Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Countries */}
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <div className="mb-4 flex items-center gap-2">
             <Globe className="h-5 w-5 text-muted-foreground" />
             <h2 className="text-lg font-semibold">Top Countries</h2>
@@ -542,7 +542,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Referrers */}
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h2 className="mb-4 text-lg font-semibold">Top Referrers</h2>
           {referrersData.length > 0 ? (
             <div className="space-y-3">
@@ -574,7 +574,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Top Links */}
-      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+      <div className="glass-card rounded-xl p-6 text-card-foreground">
         <h2 className="mb-4 text-lg font-semibold">Top Performing Links</h2>
         {topLinksData.length > 0 ? (
           <div className="overflow-x-auto">
