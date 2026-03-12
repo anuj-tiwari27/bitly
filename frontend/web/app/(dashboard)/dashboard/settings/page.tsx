@@ -29,6 +29,9 @@ export default function SettingsPage() {
 
   const user = userData?.data
   const isAdmin = Array.isArray(user?.roles) && user.roles.includes('admin')
+  const isOrgManager =
+    Array.isArray(user?.roles) &&
+    (user.roles.includes('admin') || user.roles.includes('store_manager'))
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -156,8 +159,8 @@ export default function SettingsPage() {
         </dl>
       </div>
 
-      {/* Organization section - for org owners/admins */}
-      <OrganizationSettingsSection queryClient={queryClient} />
+      {/* Organization section - hidden for individual / non-org-manager users */}
+      {isOrgManager && <OrganizationSettingsSection queryClient={queryClient} />}
 
       {/* Admin section - platform admins only */}
       {isAdmin && <AdminRoleSettingsSection queryClient={queryClient} />}

@@ -74,7 +74,8 @@ export const linksApi = {
     organization_id?: string;
   }) => api.post('/links', data),
   update: (id: string, data: any) => api.put(`/links/${id}`, data),
-  delete: (id: string) => api.delete(`/links/${id}`),
+  delete: (id: string, params?: { permanent?: boolean }) =>
+    api.delete(`/links/${id}`, { params }),
   stats: (id: string) => api.get(`/links/${id}/stats`),
 }
 

@@ -4,8 +4,19 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import {
-  Link2, Plus, Search, Copy, ExternalLink, QrCode, Trash2,
-  Check, Calendar, MousePointerClick, FileUp
+  Link2,
+  Plus,
+  Search,
+  Copy,
+  ExternalLink,
+  QrCode,
+  Trash2,
+  Check,
+  Calendar,
+  MousePointerClick,
+  FileUp,
+  PauseCircle,
+  PlayCircle,
 } from 'lucide-react'
 import { linksApi } from '@/lib/api'
 import { formatNumber, formatDate, truncateUrl, copyToClipboard } from '@/lib/utils'
@@ -28,7 +39,13 @@ export default function LinksPage() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => linksApi.delete(id),
+    mutationFn: (id: string) => linksApi.delete(id, { permanent: true }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['links'] }),
+  })
+
+  const toggleActiveMutation = useMutation({
+    mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
+      linksApi.update(id, { is_active }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['links'] }),
   })
 
@@ -252,6 +269,28 @@ export default function LinksPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end space-x-2">
+                        <button
+                          onClick={() =>
+                            toggleActiveMutation.mutate({
+                              id: link.id,
+                              is_active: !link.is_active,
+                            })
+                          }
+                          className="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-medium border hover:bg-gray-50"
+                          title={link.is_active ? 'Make inactive' : 'Activate link'}
+                        >
+                          {link.is_active ? (
+                            <>
+                              <PauseCircle className="h-3 w-3 mr-1 text-gray-500" />
+                              Inactivate
+                            </>
+                          ) : (
+                            <>
+                              <PlayCircle className="h-3 w-3 mr-1 text-green-600" />
+                              Activate
+                            </>
+                          )}
+                        </button>
                         <Link
                           href={`/dashboard/links/${link.id}/qr`}
                           className="p-2 hover:bg-gray-100 rounded-lg"
@@ -261,12 +300,12 @@ export default function LinksPage() {
                         </Link>
                         <button
                           onClick={() => {
-                            if (confirm('Are you sure you want to delete this link?')) {
+                            if (confirm('This will permanently delete the link. Continue?')) {
                               deleteMutation.mutate(link.id)
                             }
                           }}
                           className="p-2 hover:bg-red-50 rounded-lg"
-                          title="Delete"
+                          title="Delete permanently"
                         >
                           <Trash2 className="h-4 w-4 text-red-500" />
                         </button>
