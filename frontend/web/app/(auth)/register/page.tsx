@@ -73,9 +73,8 @@ export default function RegisterPage() {
         last_name: formData.last_name,
         account_type: accountType,
         organization_name: accountType === 'organization' ? organization.name : undefined,
-        organization_website: accountType === 'organization' ? organization.website || undefined : undefined,
-        organization_industry: accountType === 'organization' ? organization.industry || undefined : undefined,
-        organization_team_size: accountType === 'organization' ? organization.team_size || undefined : undefined,
+        organization_website:
+          accountType === 'organization' ? organization.website || undefined : undefined,
       })
       localStorage.setItem('access_token', response.data.access_token)
       localStorage.setItem('refresh_token', response.data.refresh_token)
@@ -254,36 +253,6 @@ export default function RegisterPage() {
                     className="glass-input w-full rounded-lg px-4 py-3"
                     placeholder="https://example.com"
                   />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label htmlFor="industry" className="block text-sm font-medium text-muted-foreground mb-1">
-                      Industry (optional)
-                    </label>
-                    <input
-                      id="industry"
-                      name="industry"
-                      type="text"
-                      value={organization.industry}
-                      onChange={handleOrgChange}
-                      className="glass-input w-full rounded-lg px-4 py-3"
-                      placeholder="Retail, SaaS, etc."
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="team_size" className="block text-sm font-medium text-muted-foreground mb-1">
-                      Team size (optional)
-                    </label>
-                    <input
-                      id="team_size"
-                      name="team_size"
-                      type="text"
-                      value={organization.team_size}
-                      onChange={handleOrgChange}
-                      className="glass-input w-full rounded-lg px-4 py-3"
-                      placeholder="1-10, 11-50..."
-                    />
-                  </div>
                 </div>
               </div>
             )}
