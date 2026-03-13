@@ -3,7 +3,7 @@ from typing import List, Optional
 from uuid import UUID, uuid4
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, JSON
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy.dialects.postgresql import UUID as PGUUID, ENUM as PGEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
@@ -18,7 +18,19 @@ class Campaign(Base):
     store_id: Mapped[Optional[UUID]] = mapped_column(PGUUID(as_uuid=True), ForeignKey("stores.id", ondelete="SET NULL"), nullable=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    status: Mapped[str] = mapped_column(String(20), default="draft")
+    status: Mapped[str] = mapped_column(
+        PGEnum(
+            "draft",
+            "active",
+            "paused",
+            "completed",
+            "archived",
+            name="campaign_status",
+            create_type=False,
+        ),
+        server_default="draft",
+        nullable=False,
+    )
     start_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     end_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     extra_data: Mapped[dict] = mapped_column(JSON, default=dict)
