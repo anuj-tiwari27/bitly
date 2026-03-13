@@ -416,7 +416,7 @@ services:
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`thelittleurl.com`,`www.thelittleurl.com`) && PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.rule=Host(`thelittleurl.com`,`www.thelittleurl.com`)"
       - "traefik.http.routers.frontend.entrypoints=web,websecure"
       - "traefik.http.routers.frontend.priority=1"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
