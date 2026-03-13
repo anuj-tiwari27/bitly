@@ -406,15 +406,15 @@ services:
       - REDIRECT_SERVICE_URL=http://redirect-service:8000
       - ANALYTICS_SERVICE_URL=http://analytics-processor:8000
       - DOCUMENT_SERVICE_URL=http://document-service:8000
-      - NEXT_PUBLIC_REDIRECT_URL=http://localhost:8005
-      - NEXTAUTH_URL=http://localhost:3000
+      - NEXT_PUBLIC_REDIRECT_URL=${NEXT_PUBLIC_REDIRECT_URL:-http://localhost:8005}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-your-nextauth-secret-change-in-production}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.rule=Host(`thelittleurl.com`,`www.thelittleurl.com`) && PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web,websecure"
       - "traefik.http.routers.frontend.priority=1"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
     networks:
