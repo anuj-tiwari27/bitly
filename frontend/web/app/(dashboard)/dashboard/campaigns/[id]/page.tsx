@@ -12,6 +12,7 @@ import {
   Link2,
   Clock,
   Plus,
+  Pencil,
 } from 'lucide-react'
 import { campaignsApi, analyticsApi, linksApi } from '@/lib/api'
 import { formatDate, formatNumber } from '@/lib/utils'
@@ -72,12 +73,21 @@ export default function CampaignDetailPage() {
     [allLinks, campaignId],
   )
 
+  const campaignLinks = campaign?.links ?? []
+  const campaignLinkCount =
+    (Array.isArray(campaignLinks) && campaignLinks.length) ||
+    analytics.overview?.total_links ||
+    campaign?.link_count ||
+    0
+
   const addExistingMutation = useMutation({
     mutationFn: (linkId: string) => linksApi.update(linkId, { campaign_id: campaignId }),
     onSuccess: () => {
       setSelectedLinkId('')
       queryClient.invalidateQueries({ queryKey: ['campaign-analytics', campaignId] })
       queryClient.invalidateQueries({ queryKey: ['links'] })
+      queryClient.invalidateQueries({ queryKey: ['campaign', campaignId] })
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] })
     },
   })
 
@@ -122,20 +132,29 @@ export default function CampaignDetailPage() {
             </p>
           </div>
         </div>
-        <div className="glass-card flex flex-wrap items-center gap-2 rounded-lg p-1 text-card-foreground">
-          {[7, 14, 30, 90].map((d) => (
-            <button
-              key={d}
-              onClick={() => setDays(d as DateRange)}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                days === d
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-muted'
-              }`}
-            >
-              {d} Days
-            </button>
-          ))}
+        <div className="flex flex-col items-end gap-3">
+          <Link
+            href={`/dashboard/campaigns/${campaignId}/edit`}
+            className="inline-flex items-center rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
+          >
+            <Pencil className="mr-1 h-3.5 w-3.5" />
+            Edit campaign
+          </Link>
+          <div className="glass-card flex flex-wrap items-center gap-2 rounded-lg p-1 text-card-foreground">
+            {[7, 14, 30, 90].map((d) => (
+              <button
+                key={d}
+                onClick={() => setDays(d as DateRange)}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  days === d
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                {d} Days
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -176,7 +195,7 @@ export default function CampaignDetailPage() {
           <div className="rounded-lg bg-slate-900/70 p-4">
             <p className="text-xs text-muted-foreground">Links in campaign</p>
             <p className="mt-1 text-2xl font-semibold">
-              {formatNumber(analytics.overview?.total_links || campaign.link_count || 0)}
+              {formatNumber(campaignLinkCount)}
             </p>
           </div>
           <div className="rounded-lg bg-slate-900/70 p-4">
@@ -186,13 +205,76 @@ export default function CampaignDetailPage() {
         </div>
       </div>
 
-      {/* Add / Create links in campaign */}
+      {/* Links already in campaign */}
       <div className="glass-card rounded-xl p-6 text-card-foreground">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold">Links in this campaign</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Create a new link for this campaign or add an existing one.
+              These links are currently attached to this campaign.
+            </p>
+          </div>
+          <span className="rounded-full bg-slate-900/70 px-3 py-1 text-xs text-muted-foreground">
+            {formatNumber(campaignLinks.length)} link{campaignLinks.length === 1 ? '' : 's'}
+          </span>
+        </div>
+        {campaignLinks.length === 0 ? (
+          <div className="flex h-24 items-center justify-center text-sm text-muted-foreground">
+            No links have been added to this campaign yet.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-800 text-xs uppercase text-muted-foreground">
+                  <th className="py-2 pr-4 text-left">Title</th>
+                  <th className="py-2 pr-4 text-left">Short code</th>
+                  <th className="py-2 pr-4 text-left">Clicks</th>
+                  <th className="py-2 text-right">Open</th>
+                </tr>
+              </thead>
+              <tbody>
+                {campaignLinks.map((link: any) => (
+                  <tr key={link.id} className="border-b border-slate-800 last:border-0">
+                    <td className="py-2 pr-4">
+                      <div className="flex flex-col">
+                        <span className="text-sm text-card-foreground">
+                          {link.title || 'Untitled link'}
+                        </span>
+                        <span className="break-all text-xs text-muted-foreground">
+                          {link.destination_url}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-2 pr-4 font-mono text-xs text-primary sm:text-sm">
+                      {link.short_code}
+                    </td>
+                    <td className="py-2 pr-4 text-sm">
+                      {formatNumber(link.click_count || 0)}
+                    </td>
+                    <td className="py-2 text-right text-xs">
+                      <Link
+                        href={`/dashboard/links/${link.id}`}
+                        className="text-primary hover:underline"
+                      >
+                        View link
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Add links to campaign */}
+      <div className="glass-card rounded-xl p-6 text-card-foreground">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">Add link to this campaign</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Attach an existing link or create a new one directly into this campaign.
             </p>
           </div>
           <Link
@@ -283,7 +365,7 @@ export default function CampaignDetailPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">
-                {formatNumber(analytics.overview?.total_links || campaign.link_count || 0)}
+                {formatNumber(campaignLinkCount)}
               </p>
               <p className="text-xs text-muted-foreground">Links</p>
             </div>
