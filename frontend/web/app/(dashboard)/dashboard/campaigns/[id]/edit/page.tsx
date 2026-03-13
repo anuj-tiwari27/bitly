@@ -22,7 +22,7 @@ export default function EditCampaignPage() {
   })
   const [error, setError] = useState('')
 
-  const { data: campaignRes, isLoading } = useQuery<{ data: any }>({
+  const campaignQuery = useQuery({
     queryKey: ['campaign', campaignId],
     queryFn: () => campaignsApi.get(campaignId),
   })
@@ -33,6 +33,8 @@ export default function EditCampaignPage() {
   })
 
   const stores = storesData?.data || []
+  const campaignRes = campaignQuery.data as any
+  const isLoading = campaignQuery.isLoading
 
   useEffect(() => {
     if (campaignRes?.data) {
