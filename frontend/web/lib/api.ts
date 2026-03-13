@@ -51,6 +51,10 @@ export const authApi = {
   }) => api.post('/auth/register', data),
   login: (data: { email: string; password: string }) =>
     api.post('/auth/login', data),
+  requestOtp: (data: { email: string; purpose: 'signup' | 'login' }) =>
+    api.post('/auth/otp/request', data),
+  verifyOtp: (data: { email: string; purpose: 'signup' | 'login'; code: string }) =>
+    api.post('/auth/otp/verify', data),
   refresh: (refreshToken: string) =>
     api.post('/auth/refresh', { refresh_token: refreshToken }),
   logout: () => api.post('/auth/logout'),

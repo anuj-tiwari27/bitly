@@ -88,6 +88,17 @@ class TokenPayload(BaseSchema):
     iat: int
 
 
+class OTPRequest(BaseSchema):
+    email: EmailStr
+    purpose: Literal["signup", "login"]
+
+
+class OTPVerifyRequest(BaseSchema):
+    email: EmailStr
+    purpose: Literal["signup", "login"]
+    code: str = Field(..., min_length=4, max_length=10)
+
+
 # ===========================================
 # Role Schemas
 # ===========================================

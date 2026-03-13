@@ -13,6 +13,11 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [otpCode, setOtpCode] = useState('')
+  const [otpError, setOtpError] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpSending, setOtpSending] = useState(false)
+  const [otpVerifying, setOtpVerifying] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,6 +33,42 @@ export default function LoginPage() {
       setError(err.response?.data?.detail || 'Login failed')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSendOtp = async () => {
+    setOtpError('')
+    if (!email) {
+      setOtpError('Please enter your email first')
+      return
+    }
+    setOtpSending(true)
+    try {
+      await authApi.requestOtp({ email, purpose: 'login' })
+      setOtpSent(true)
+    } catch (err: any) {
+      setOtpError(err.response?.data?.detail || 'Failed to send code')
+    } finally {
+      setOtpSending(false)
+    }
+  }
+
+  const handleVerifyOtp = async () => {
+    setOtpError('')
+    if (!email || !otpCode.trim()) {
+      setOtpError('Enter your email and the code you received')
+      return
+    }
+    setOtpVerifying(true)
+    try {
+      const res = await authApi.verifyOtp({ email, purpose: 'login', code: otpCode.trim() })
+      localStorage.setItem('access_token', res.data.access_token)
+      localStorage.setItem('refresh_token', res.data.refresh_token)
+      router.push('/dashboard')
+    } catch (err: any) {
+      setOtpError(err.response?.data?.detail || 'Invalid or expired code')
+    } finally {
+      setOtpVerifying(false)
     }
   }
 
@@ -60,6 +101,11 @@ export default function LoginPage() {
               {error}
             </div>
           )}
+          {otpError && (
+            <div className="bg-amber-500/10 border border-amber-500/40 text-amber-200 p-3 rounded-lg text-sm">
+              {otpError}
+            </div>
+          )}
 
           <div className="space-y-4">
             <div>
@@ -67,7 +113,7 @@ export default function LoginPage() {
                 Email address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/85" />
                 <input
                   id="email"
                   type="email"
@@ -85,7 +131,7 @@ export default function LoginPage() {
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/85" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -107,17 +153,62 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-3 px-4 rounded-lg shadow-sm text-primary-foreground bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              'Sign in'
-            )}
-          </button>
+          <div className="space-y-3">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-3 px-4 rounded-lg shadow-sm text-primary-foreground bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                'Sign in'
+              )}
+            </button>
+            <div className="space-y-2 rounded-lg border border-dashed border-border/60 bg-slate-900/40 p-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs text-muted-foreground">
+                  Prefer a one-time code instead of password?
+                </span>
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  disabled={otpSending}
+                  className="inline-flex items-center rounded-md bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-60"
+                >
+                  {otpSending ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+                  Send code
+                </button>
+              </div>
+              {otpSent && (
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-muted-foreground">
+                    Enter the 6-digit code sent to your email
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value)}
+                      className="glass-input w-full rounded-lg px-3 py-2 text-sm tracking-[0.4em] text-center"
+                      placeholder="••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      disabled={otpVerifying}
+                      className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+                    >
+                      {otpVerifying ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+                      Verify & sign in
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">

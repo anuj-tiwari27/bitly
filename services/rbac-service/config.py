@@ -32,6 +32,18 @@ class Settings(BaseSettings):
     debug: bool = True
     seed_admin_email: Optional[str] = None  # If set, assign admin role to this user on startup
 
+    # Frontend
+    frontend_base_url: str = "http://localhost:3000"
+
+    # SMTP / Email (SendPulse or other SMTP provider)
+    smtp_host: str = "smtp-pulse.com"
+    smtp_port: int = 587
+    smtp_user: Optional[str] = None
+    smtp_password: Optional[str] = None
+    smtp_from_email: Optional[str] = None
+    smtp_from_name: str = "The Little URL"
+    smtp_use_tls: bool = True
+
 
 @lru_cache()
 def get_settings() -> Settings:

@@ -229,6 +229,24 @@ async def accept_invitation(
     
     await org_service.add_member(org, user, role=invitation.role)
     await invitation_service.mark_accepted(invitation)
+
+    # Notify organization owners/admins that a new member has joined.
+    try:
+        members = await org_service.list_members(org.id)
+        admin_emails = [
+            m.user.email
+            for m in members
+            if m.user and m.user.email and m.role in {"owner", "admin"}
+        ]
+        if admin_emails:
+            subject, html = render_org_member_joined_email(
+                org_name=org.name,
+                member_email=user.email,
+                role=invitation.role,
+            )
+            await send_email(to=admin_emails, subject=subject, html_body=html)
+    except Exception:
+        pass
     
     tokens = await token_service.create_tokens(user)
     return TokenResponse(**tokens)

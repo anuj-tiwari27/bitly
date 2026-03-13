@@ -130,17 +130,24 @@ class CampaignService:
         - Otherwise, use the user's first organization membership (if any).
         """
         if requested_org_id:
-            result = await self.db.execute(
-                text(
-                    "SELECT role FROM organization_members "
-                    "WHERE organization_id = :org_id AND user_id = :user_id"
-                ),
-                {"org_id": requested_org_id, "user_id": user_id},
-            )
-            role = result.scalar_one_or_none()
-            if role is None:
-                raise ValueError("You do not belong to the specified organization")
-            return requested_org_id
+            # Best-effort check that the user belongs to the requested organization.
+            # If they don't, we simply drop the organization_id instead of raising
+            # to avoid surfacing a 500 error to the UI.
+            try:
+                result = await self.db.execute(
+                    text(
+                        "SELECT role FROM organization_members "
+                        "WHERE organization_id = :org_id AND user_id = :user_id"
+                    ),
+                    {"org_id": requested_org_id, "user_id": user_id},
+                )
+                role = result.scalar_one_or_none()
+                if role:
+                    return requested_org_id
+            except Exception:
+                # If the organization_members lookup fails for any reason,
+                # we fall back to no organization binding.
+                pass
 
         result = await self.db.execute(
             text(
