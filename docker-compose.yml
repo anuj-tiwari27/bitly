@@ -13,8 +13,6 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--accesslog=true"
       - "--log.level=INFO"
-    environment:
-      - DOCKER_API_VERSION=1.41
     ports:
       - "80:80"
       - "443:443"
