@@ -426,6 +426,7 @@ services:
 
 networks:
   bitly-network:
+    name: bitly-network
     driver: bridge
 
 volumes:
