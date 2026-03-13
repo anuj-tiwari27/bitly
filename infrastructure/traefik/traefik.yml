@@ -8,12 +8,6 @@ entryPoints:
   websecure:
     address: ":443"
 
-providers:
-  docker:
-    endpoint: "unix:///var/run/docker.sock"
-    exposedByDefault: false
-    network: bitly-network
-
 log:
   level: INFO
   format: json
@@ -29,6 +23,19 @@ accessLog:
         X-Forwarded-For: keep
 
 http:
+  routers:
+    frontend:
+      rule: "Host(`thelittleurl.com`,`www.thelittleurl.com`)"
+      entryPoints:
+        - web
+      service: frontend
+
+  services:
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://bitly-frontend:3000"
+
   middlewares:
     cors:
       headers:
