@@ -63,14 +63,14 @@ export default function LinksPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
           <h1 className="text-2xl font-bold text-foreground">Links</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Manage short links and document shares
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 sm:justify-end">
           <Link
             href="/dashboard/links/upload-document"
             className={`flex items-center px-4 py-2 rounded-lg transition ${
@@ -142,7 +142,7 @@ export default function LinksPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={activeTab === 'documents' ? 'Search documents...' : 'Search links...'}
-          className="w-full rounded-lg border border-border bg-card pl-10 pr-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="glass-input w-full rounded-lg py-3 pl-10 pr-4"
         />
       </div>
 
@@ -256,8 +256,8 @@ export default function LinksPage() {
                         {formatNumber(link.click_count)}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center text-sm text-muted-foreground">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center text-sm text-muted-foreground whitespace-nowrap">
                         <Calendar className="mr-1 h-4 w-4" />
                         {formatDate(link.created_at)}
                       </div>

@@ -36,8 +36,8 @@ export default function CampaignsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
           <h1 className="text-2xl font-bold text-foreground">Campaigns</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Organize your links into campaigns
@@ -60,7 +60,7 @@ export default function CampaignsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search campaigns..."
-          className="w-full rounded-lg border border-border bg-card pl-10 pr-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+          className="glass-input w-full rounded-lg py-3 pl-10 pr-4"
         />
       </div>
 

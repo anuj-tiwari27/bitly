@@ -12,7 +12,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col leading-tight">
             <span className="text-lg font-semibold text-white">
-              thelittleurl.com
+              The Little URL
             </span>
             <span className="text-xs text-slate-400">
               Data to destination.
@@ -49,7 +49,7 @@ export default function Home() {
               in one place.
             </h1>
             <p className="mb-6 max-w-xl text-base text-slate-300 md:text-lg">
-              thelittleurl.com is your control center for everything that clicks or scans.
+              The Little URL is your control center for everything that clicks or scans.
               Create branded short links and dynamic QR codes, share documents securely, and
               see every interaction in real-time—down to device, location, and campaign.
             </p>
@@ -100,7 +100,7 @@ export default function Home() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold text-white">
-                      thelittleurl.com
+                      The Little URL
                     </span>
                     <span className="text-[11px] text-slate-400">
                       From data to destination.
@@ -164,7 +164,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-slate-800/80 bg-slate-950/90">
         <div className="container mx-auto flex items-center justify-between px-6 py-6 text-xs text-slate-400">
-          <span>© {new Date().getFullYear()} thelittleurl.com</span>
+          <span>© {new Date().getFullYear()} The Little URL</span>
           <span>Pixel-perfect pathways from link to destination.</span>
         </div>
       </footer>

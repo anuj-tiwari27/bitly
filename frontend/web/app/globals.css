@@ -63,4 +63,8 @@
   .glass-card {
     @apply bg-slate-900/70 border border-slate-700/70 backdrop-blur-xl shadow-[0_18px_60px_rgba(0,0,0,0.65)];
   }
+
+  .glass-input {
+    @apply border border-slate-700/70 bg-slate-900/55 text-slate-100 placeholder:text-slate-400/80 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.45)] focus:outline-none focus:ring-2 focus:ring-primary/70 focus:border-transparent;
+  }
 }

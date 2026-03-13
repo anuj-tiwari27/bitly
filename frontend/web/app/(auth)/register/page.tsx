@@ -86,7 +86,7 @@ export default function RegisterPage() {
               <span className="text-sm font-semibold text-white">tl</span>
             </div>
             <div className="flex flex-col leading-tight text-left">
-              <span className="text-2xl font-bold text-foreground">thelittleurl.com</span>
+              <span className="text-2xl font-bold text-foreground">The Little URL</span>
               <span className="text-xs text-muted-foreground">
                 Pixel transformation for links.
               </span>
@@ -153,7 +153,7 @@ export default function RegisterPage() {
                     type="text"
                     value={formData.first_name}
                     onChange={handleChange}
-                    className="pl-10 w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="glass-input w-full rounded-lg px-4 py-3 pl-10"
                     placeholder="John"
                   />
                 </div>
@@ -168,7 +168,7 @@ export default function RegisterPage() {
                   type="text"
                   value={formData.last_name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="glass-input w-full rounded-lg px-4 py-3"
                   placeholder="Doe"
                 />
               </div>
@@ -187,7 +187,7 @@ export default function RegisterPage() {
                     value={organization.name}
                     onChange={handleOrgChange}
                     required
-                    className="w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="glass-input w-full rounded-lg px-4 py-3"
                     placeholder="Acme Inc."
                   />
                 </div>
@@ -201,7 +201,7 @@ export default function RegisterPage() {
                     type="text"
                     value={organization.website}
                     onChange={handleOrgChange}
-                    className="w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="glass-input w-full rounded-lg px-4 py-3"
                     placeholder="https://example.com"
                   />
                 </div>
@@ -216,7 +216,7 @@ export default function RegisterPage() {
                       type="text"
                       value={organization.industry}
                       onChange={handleOrgChange}
-                      className="w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="glass-input w-full rounded-lg px-4 py-3"
                       placeholder="Retail, SaaS, etc."
                     />
                   </div>
@@ -230,7 +230,7 @@ export default function RegisterPage() {
                       type="text"
                       value={organization.team_size}
                       onChange={handleOrgChange}
-                      className="w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="glass-input w-full rounded-lg px-4 py-3"
                       placeholder="1-10, 11-50..."
                     />
                   </div>
@@ -251,7 +251,7 @@ export default function RegisterPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="pl-10 w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="glass-input w-full rounded-lg px-4 py-3 pl-10"
                   placeholder="you@example.com"
                 />
               </div>
@@ -270,7 +270,7 @@ export default function RegisterPage() {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="pl-10 pr-10 w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="glass-input w-full rounded-lg px-4 py-3 pl-10 pr-10"
                   placeholder="••••••••"
                 />
                 <button
@@ -300,7 +300,7 @@ export default function RegisterPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  className="pl-10 pr-10 w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="glass-input w-full rounded-lg px-4 py-3 pl-10 pr-10"
                   placeholder="••••••••"
                 />
                 <button

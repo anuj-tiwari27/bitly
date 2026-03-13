@@ -71,7 +71,7 @@ export default function SettingsPage() {
               type="email"
               value={user?.email || ''}
               disabled
-              className="w-full rounded-lg border border-border bg-muted px-4 py-3 text-muted-foreground"
+              className="glass-input w-full rounded-lg px-4 py-3 text-muted-foreground opacity-80"
             />
           </div>
 
@@ -85,7 +85,7 @@ export default function SettingsPage() {
                 name="first_name"
                 value={formData.first_name}
                 onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="glass-input w-full rounded-lg px-4 py-3"
               />
             </div>
             <div>
@@ -97,7 +97,7 @@ export default function SettingsPage() {
                 name="last_name"
                 value={formData.last_name}
                 onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="glass-input w-full rounded-lg px-4 py-3"
               />
             </div>
           </div>
@@ -263,7 +263,7 @@ function OrganizationSettingsSection({ queryClient }: { queryClient: ReturnType<
             <select
               value={orgId}
               onChange={handleOrgSwitch}
-              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary"
+              className="glass-input w-full rounded-lg px-4 py-3"
             >
               {orgs.map((o: any) => (
                 <option key={o.id} value={o.id}>{o.name}</option>
@@ -280,7 +280,7 @@ function OrganizationSettingsSection({ queryClient }: { queryClient: ReturnType<
             name="name"
             value={form.name}
             onChange={handleOrgChange}
-            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="glass-input w-full rounded-lg px-4 py-3"
           />
         </div>
         <div>
@@ -292,7 +292,7 @@ function OrganizationSettingsSection({ queryClient }: { queryClient: ReturnType<
             name="slug"
             value={form.slug}
             onChange={handleOrgChange}
-            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="glass-input w-full rounded-lg px-4 py-3"
           />
         </div>
         <div>
@@ -305,7 +305,7 @@ function OrganizationSettingsSection({ queryClient }: { queryClient: ReturnType<
             value={form.website}
             onChange={handleOrgChange}
             placeholder="https://example.com"
-            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="glass-input w-full rounded-lg px-4 py-3"
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -318,7 +318,7 @@ function OrganizationSettingsSection({ queryClient }: { queryClient: ReturnType<
               name="industry"
               value={form.industry}
               onChange={handleOrgChange}
-              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="glass-input w-full rounded-lg px-4 py-3"
             />
           </div>
           <div>
@@ -331,7 +331,7 @@ function OrganizationSettingsSection({ queryClient }: { queryClient: ReturnType<
               value={form.team_size}
               onChange={handleOrgChange}
               placeholder="e.g. 1-10"
-              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="glass-input w-full rounded-lg px-4 py-3"
             />
           </div>
         </div>
@@ -402,7 +402,7 @@ function AdminRoleSettingsSection({ queryClient }: { queryClient: ReturnType<typ
             <select
               value={selectedUserId}
               onChange={(e) => setSelectedUserId(e.target.value)}
-              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary"
+              className="glass-input w-full rounded-lg px-4 py-3"
             >
               <option value="">Select user</option>
               {users.map((u: any) => (
@@ -419,7 +419,7 @@ function AdminRoleSettingsSection({ queryClient }: { queryClient: ReturnType<typ
             <select
               value={selectedRoleId}
               onChange={(e) => setSelectedRoleId(e.target.value)}
-              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:ring-2 focus:ring-primary"
+              className="glass-input w-full rounded-lg px-4 py-3"
             >
               <option value="">Select role</option>
               {roles.map((r: any) => (

@@ -40,7 +40,7 @@ export default function LoginPage() {
               <span className="text-sm font-semibold text-white">tl</span>
             </div>
             <div className="flex flex-col leading-tight text-left">
-              <span className="text-2xl font-bold text-foreground">thelittleurl.com</span>
+              <span className="text-2xl font-bold text-foreground">The Little URL</span>
               <span className="text-xs text-muted-foreground">
                 Pixel transformation for links.
               </span>
@@ -74,7 +74,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pl-10 w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="glass-input w-full rounded-lg px-4 py-3 pl-10"
                   placeholder="you@example.com"
                 />
               </div>
@@ -92,7 +92,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="pl-10 pr-10 w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="glass-input w-full rounded-lg px-4 py-3 pl-10 pr-10"
                   placeholder="••••••••"
                 />
                 <button

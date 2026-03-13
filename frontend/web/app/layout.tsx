@@ -3,9 +3,9 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: 'thelittleurl.com – Pixel Transformation for Links & QR',
+  title: 'The Little URL – Pixel Transformation for Links & QR',
   description:
-    'Condense long URLs into elegant, trackable short links and QR codes. thelittleurl.com turns data into destination with real-time analytics.',
+    'Condense long URLs into elegant, trackable short links and QR codes. The Little URL turns data into destination with real-time analytics.',
 }
 
 export default function RootLayout({

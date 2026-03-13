@@ -111,7 +111,7 @@ export default function NewCampaignPage() {
               value={formData.name}
               onChange={handleChange}
               placeholder="Summer Sale 2024"
-              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+              className="glass-input w-full rounded-lg px-4 py-3"
               required
             />
           </div>
@@ -126,7 +126,7 @@ export default function NewCampaignPage() {
               onChange={handleChange}
               rows={3}
               placeholder="Describe your campaign..."
-              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+              className="glass-input w-full rounded-lg px-4 py-3"
             />
           </div>
 
@@ -139,7 +139,7 @@ export default function NewCampaignPage() {
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="glass-input w-full rounded-lg px-4 py-3"
               >
                 <option value="draft">Draft</option>
                 <option value="active">Active</option>
@@ -155,7 +155,7 @@ export default function NewCampaignPage() {
                 name="store_id"
                 value={formData.store_id}
                 onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="glass-input w-full rounded-lg px-4 py-3"
               >
                 <option value="">No store</option>
                 {stores.map((store: any) => (
@@ -177,7 +177,7 @@ export default function NewCampaignPage() {
                 name="start_date"
                 value={formData.start_date}
                 onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="glass-input w-full rounded-lg px-4 py-3"
               />
             </div>
 
@@ -190,7 +190,7 @@ export default function NewCampaignPage() {
                 name="end_date"
                 value={formData.end_date}
                 onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="glass-input w-full rounded-lg px-4 py-3"
               />
             </div>
           </div>

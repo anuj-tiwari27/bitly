@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   Shield,
+  Building2,
 } from 'lucide-react'
 import { authApi } from '@/lib/api'
 
@@ -67,6 +68,9 @@ export default function DashboardLayout({
   }
 
   const isAdmin = Array.isArray(user.roles) && user.roles.includes('admin')
+  const isOrgManager =
+    Array.isArray(user.roles) &&
+    (user.roles.includes('admin') || user.roles.includes('store_manager'))
   if (pathname.startsWith('/dashboard/admin') && !isAdmin) {
     router.replace('/dashboard')
     return (
@@ -75,9 +79,17 @@ export default function DashboardLayout({
       </div>
     )
   }
-  const navigation = isAdmin
-    ? [...baseNavigation, { name: 'Admin', href: '/dashboard/admin', icon: Shield }]
-    : baseNavigation
+  let navigation = [...baseNavigation]
+  if (isOrgManager) {
+    navigation.splice(4, 0, {
+      name: 'Organization',
+      href: '/dashboard/organizations',
+      icon: Building2,
+    })
+  }
+  if (isAdmin) {
+    navigation = [...navigation, { name: 'Admin', href: '/dashboard/admin', icon: Shield }]
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-foreground">
@@ -104,7 +116,7 @@ export default function DashboardLayout({
               </div>
               <div className="flex flex-col leading-tight">
                 <span className="text-sm font-semibold text-white">
-                  thelittleurl.com
+                  The Little URL
                 </span>
                 <span className="text-[11px] text-slate-400">
                   Pixel transformation for links.

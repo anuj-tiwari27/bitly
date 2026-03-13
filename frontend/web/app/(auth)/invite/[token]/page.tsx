@@ -102,21 +102,21 @@ export default function InviteAcceptPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
-      <div className="w-full max-w-md space-y-8 rounded-2xl border border-slate-800 bg-card/70 p-6 shadow-xl backdrop-blur">
+      <div className="glass-card w-full max-w-md space-y-8 rounded-2xl p-6">
         <div className="text-center">
           <Link href="/" className="flex items-center justify-center space-x-2">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary">
               <span className="text-sm font-semibold text-white">tl</span>
             </div>
             <div className="flex flex-col leading-tight text-left">
-              <span className="text-xl font-bold text-foreground">thelittleurl.com</span>
+              <span className="text-xl font-bold text-foreground">The Little URL</span>
               <span className="text-xs text-muted-foreground">
                 Pixel transformation for links.
               </span>
             </div>
           </Link>
           <h2 className="mt-6 text-2xl font-bold text-foreground">
-            Join {invite.organization_id ? 'the organization' : 'thelittleurl.com'}
+            Join {invite.organization_id ? 'the organization' : 'The Little URL'}
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
             You&apos;ve been invited as <span className="font-semibold">{invite.role}</span> for
@@ -147,7 +147,7 @@ export default function InviteAcceptPage() {
                   name="first_name"
                   value={form.first_name}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-border bg-card px-3 py-2 pl-9 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+                  className="glass-input w-full rounded-lg px-3 py-2 pl-9 text-sm"
                   placeholder="John"
                 />
               </div>
@@ -161,7 +161,7 @@ export default function InviteAcceptPage() {
                 name="last_name"
                 value={form.last_name}
                 onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="glass-input w-full rounded-lg px-3 py-2 text-sm"
                 placeholder="Doe"
               />
             </div>
@@ -179,7 +179,7 @@ export default function InviteAcceptPage() {
                 value={form.password}
                 onChange={handleChange}
                 required
-                className="w-full rounded-lg border border-border bg-card px-3 py-2 pl-9 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="glass-input w-full rounded-lg px-3 py-2 pl-9 text-sm"
                 placeholder="••••••••"
               />
             </div>
@@ -200,7 +200,7 @@ export default function InviteAcceptPage() {
                 value={form.confirmPassword}
                 onChange={handleChange}
                 required
-                className="w-full rounded-lg border border-border bg-card px-3 py-2 pl-9 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="glass-input w-full rounded-lg px-3 py-2 pl-9 text-sm"
                 placeholder="••••••••"
               />
             </div>

@@ -99,7 +99,8 @@ export default function AnalyticsPage() {
   const { data: realtimeData } = useQuery({
     queryKey: ['analytics-realtime'],
     queryFn: () => analyticsApi.realtime(),
-    refetchInterval: 30000,
+    // Poll more frequently to keep the real-time strip fresh
+    refetchInterval: 10000,
   })
 
   const stats = overview?.data || { total_clicks: 0, unique_visitors: 0, clicks_today: 0, clicks_this_week: 0, clicks_this_month: 0 }
@@ -119,14 +120,14 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
       {/* Header with Date Range Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Track your link performance and audience insights
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-lg border bg-card p-1 text-card-foreground">
+        <div className="glass-card flex flex-wrap items-center gap-2 rounded-lg p-1 text-card-foreground">
           {(['7d', '14d', '30d', '90d'] as DateRange[]).map((range) => (
             <button
               key={range}
@@ -144,8 +145,8 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Real-time Stats */}
-      <div className="rounded-xl bg-gradient-to-r from-primary to-secondary p-6 text-primary-foreground">
-        <div className="flex items-center gap-2 mb-4">
+      <div className="glass-card rounded-xl bg-gradient-to-r from-primary to-secondary p-6 text-primary-foreground">
+        <div className="mb-4 flex items-center gap-2">
           <Zap className="h-5 w-5" />
           <h2 className="text-lg font-semibold">Real-time Activity</h2>
           <span className="flex h-2 w-2 relative ml-2">

@@ -230,7 +230,7 @@ export default function UploadDocumentPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="My document"
-                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-secondary"
+                className="glass-input w-full rounded-lg px-4 py-3"
               />
             </div>
 
@@ -283,7 +283,7 @@ export default function UploadDocumentPage() {
                   type="text"
                   readOnly
                   value={shortUrl}
-                  className="flex-1 rounded-lg border border-border bg-muted px-4 py-3 font-mono text-sm text-foreground"
+                  className="glass-input flex-1 rounded-lg px-4 py-3 font-mono text-sm"
                 />
                 <button
                   onClick={copyShortUrl}

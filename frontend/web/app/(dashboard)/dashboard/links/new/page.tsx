@@ -115,7 +115,7 @@ export default function NewLinkPage() {
               value={formData.destination_url}
               onChange={handleChange}
               placeholder="https://example.com/your-long-url"
-              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+              className="glass-input w-full rounded-lg px-4 py-3"
               required
             />
           </div>
@@ -130,7 +130,7 @@ export default function NewLinkPage() {
               value={formData.title}
               onChange={handleChange}
               placeholder="My awesome link"
-              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+              className="glass-input w-full rounded-lg px-4 py-3"
             />
           </div>
 
@@ -144,7 +144,7 @@ export default function NewLinkPage() {
               onChange={handleChange}
               rows={2}
               placeholder="A brief description of this link"
-              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+              className="glass-input w-full rounded-lg px-4 py-3"
             />
           </div>
 
@@ -159,7 +159,7 @@ export default function NewLinkPage() {
                 value={formData.custom_code}
                 onChange={handleChange}
                 placeholder="my-link"
-                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="glass-input w-full rounded-lg px-4 py-3"
               />
               <p className="mt-1 text-xs text-muted-foreground">
                 Leave empty for auto-generated code
@@ -174,7 +174,7 @@ export default function NewLinkPage() {
                 name="campaign_id"
                 value={formData.campaign_id}
                 onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="glass-input w-full rounded-lg px-4 py-3"
               >
                 <option value="">No campaign</option>
                 {campaigns.map((campaign: any) => (
@@ -196,7 +196,7 @@ export default function NewLinkPage() {
                 name="expires_at"
                 value={formData.expires_at}
                 onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="glass-input w-full rounded-lg px-4 py-3"
               />
             </div>
 
@@ -211,7 +211,7 @@ export default function NewLinkPage() {
                 onChange={handleChange}
                 placeholder="Unlimited"
                 min="1"
-                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="glass-input w-full rounded-lg px-4 py-3"
               />
             </div>
           </div>
@@ -226,7 +226,7 @@ export default function NewLinkPage() {
               value={formData.password}
               onChange={handleChange}
               placeholder="Enter password to protect link"
-              className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-primary"
+            className="glass-input w-full rounded-lg px-4 py-3"
             />
           </div>
 

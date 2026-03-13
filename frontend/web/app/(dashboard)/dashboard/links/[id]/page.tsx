@@ -137,7 +137,7 @@ export default function LinkDetailPage() {
       </div>
 
       {/* Link URL Card */}
-      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+      <div className="glass-card rounded-xl p-6 text-card-foreground">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <p className="mb-1 text-sm text-muted-foreground">Short URL</p>
@@ -189,7 +189,7 @@ export default function LinkDetailPage() {
       {/* Date Range Selector */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-foreground">Link Analytics</h2>
-        <div className="flex items-center gap-2 rounded-lg border bg-card p-1 text-card-foreground">
+        <div className="glass-card flex items-center gap-2 rounded-lg p-1 text-card-foreground">
           {[7, 14, 30, 90].map((d) => (
             <button
               key={d}
@@ -208,7 +208,7 @@ export default function LinkDetailPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-        <div className="rounded-xl border bg-card p-4 text-card-foreground">
+        <div className="glass-card rounded-xl p-4 text-card-foreground">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
               <MousePointerClick className="h-5 w-5 text-primary" />
@@ -221,7 +221,7 @@ export default function LinkDetailPage() {
             </div>
           </div>
         </div>
-        <div className="rounded-xl border bg-card p-4 text-card-foreground">
+        <div className="glass-card rounded-xl p-4 text-card-foreground">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
               <Users className="h-5 w-5 text-emerald-400" />
@@ -234,7 +234,7 @@ export default function LinkDetailPage() {
             </div>
           </div>
         </div>
-        <div className="rounded-xl border bg-card p-4 text-card-foreground">
+        <div className="glass-card rounded-xl p-4 text-card-foreground">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
               <TrendingUp className="h-5 w-5 text-amber-400" />
@@ -247,7 +247,7 @@ export default function LinkDetailPage() {
             </div>
           </div>
         </div>
-        <div className="rounded-xl border bg-card p-4 text-card-foreground">
+        <div className="glass-card rounded-xl p-4 text-card-foreground">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/10">
               <Calendar className="h-5 w-5 text-secondary" />
@@ -260,7 +260,7 @@ export default function LinkDetailPage() {
             </div>
           </div>
         </div>
-        <div className="rounded-xl border bg-card p-4 text-card-foreground">
+        <div className="glass-card rounded-xl p-4 text-card-foreground">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-fuchsia-500/10">
               <Clock className="h-5 w-5 text-fuchsia-400" />
@@ -276,7 +276,7 @@ export default function LinkDetailPage() {
       </div>
 
       {/* Clicks Over Time Chart */}
-      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+      <div className="glass-card rounded-xl p-6 text-card-foreground">
         <h3 className="mb-4 font-semibold">Clicks Over Time</h3>
         <div className="h-64">
           {analytics.clicks_over_time?.length > 0 ? (
@@ -333,7 +333,7 @@ export default function LinkDetailPage() {
       {/* Device & Browser Row */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Devices */}
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h3 className="mb-4 font-semibold">Devices</h3>
           {analytics.devices?.length > 0 ? (
             <div className="flex items-center">
@@ -388,7 +388,7 @@ export default function LinkDetailPage() {
         </div>
 
         {/* Browsers */}
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h3 className="mb-4 font-semibold">Browsers</h3>
           {analytics.browsers?.length > 0 ? (
             <div className="h-40">
@@ -419,7 +419,7 @@ export default function LinkDetailPage() {
       {/* Countries & Referrers Row */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Countries */}
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <div className="mb-4 flex items-center gap-2">
             <Globe className="h-5 w-5 text-muted-foreground" />
             <h3 className="font-semibold">Top Countries</h3>
@@ -460,7 +460,7 @@ export default function LinkDetailPage() {
         </div>
 
         {/* Referrers */}
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h3 className="mb-4 font-semibold">Top Referrers</h3>
           {analytics.referrers?.length > 0 ? (
             <div className="space-y-3">
@@ -497,7 +497,7 @@ export default function LinkDetailPage() {
 
       {/* UTM Sources */}
       {analytics.utm_sources?.length > 0 && (
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h3 className="mb-4 font-semibold">UTM Sources</h3>
           <div className="space-y-3">
             {analytics.utm_sources.slice(0, 6).map((source: any) => {
@@ -528,12 +528,12 @@ export default function LinkDetailPage() {
       )}
 
       {/* Link Details */}
-      <div className="rounded-xl border bg-card p-6 text-card-foreground">
+      <div className="glass-card rounded-xl p-6 text-card-foreground">
         <h3 className="mb-4 font-semibold">Link Details</h3>
         <dl className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <dt className="text-sm text-muted-foreground">Created</dt>
-            <dd className="text-card-foreground">{formatDate(link.created_at)}</dd>
+            <dd className="whitespace-nowrap text-card-foreground">{formatDate(link.created_at)}</dd>
           </div>
           {link.description && (
             <div>
