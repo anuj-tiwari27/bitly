@@ -1,0 +1,14 @@
+http:
+  routers:
+    frontend:
+      rule: "Host(`thelittleurl.com`,`www.thelittleurl.com`)"
+      entryPoints:
+        - web
+      service: frontend
+
+  services:
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://bitly-frontend:3000"
+

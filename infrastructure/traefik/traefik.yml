@@ -8,6 +8,11 @@ entryPoints:
   websecure:
     address: ":443"
 
+providers:
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
 log:
   level: INFO
   format: json
@@ -21,47 +26,3 @@ accessLog:
       names:
         User-Agent: keep
         X-Forwarded-For: keep
-
-http:
-  routers:
-    frontend:
-      rule: "Host(`thelittleurl.com`,`www.thelittleurl.com`)"
-      entryPoints:
-        - web
-      service: frontend
-
-  services:
-    frontend:
-      loadBalancer:
-        servers:
-          - url: "http://bitly-frontend:3000"
-
-  middlewares:
-    cors:
-      headers:
-        accessControlAllowMethods:
-          - GET
-          - POST
-          - PUT
-          - DELETE
-          - OPTIONS
-        accessControlAllowHeaders:
-          - Content-Type
-          - Authorization
-        accessControlAllowOriginList:
-          - "http://localhost"
-          - "http://localhost:3000"
-        accessControlMaxAge: 100
-        addVaryHeader: true
-    
-    rate-limit:
-      rateLimit:
-        average: 100
-        burst: 50
-        period: 1s
-    
-    redirect-rate-limit:
-      rateLimit:
-        average: 1000
-        burst: 200
-        period: 1s
