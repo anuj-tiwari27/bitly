@@ -73,6 +73,8 @@ class ClickEvent(BaseModel):
     link_id: str
     campaign_id: Optional[str] = None
     store_id: Optional[str] = None
+    user_id: Optional[str] = None
+    organization_id: Optional[str] = None
     short_code: str
     destination_url: str
     timestamp: str

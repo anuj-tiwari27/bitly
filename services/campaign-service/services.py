@@ -118,6 +118,40 @@ class CampaignService:
         await self.db.refresh(campaign)
         return campaign
 
+    async def _resolve_organization_id(
+        self,
+        user_id: UUID,
+        requested_org_id: Optional[UUID],
+    ) -> Optional[UUID]:
+        """
+        Resolve which organization a new campaign should belong to.
+
+        - If the caller passes an organization_id, ensure the user is a member.
+        - Otherwise, use the user's first organization membership (if any).
+        """
+        if requested_org_id:
+            result = await self.db.execute(
+                text(
+                    "SELECT role FROM organization_members "
+                    "WHERE organization_id = :org_id AND user_id = :user_id"
+                ),
+                {"org_id": requested_org_id, "user_id": user_id},
+            )
+            role = result.scalar_one_or_none()
+            if role is None:
+                raise ValueError("You do not belong to the specified organization")
+            return requested_org_id
+
+        result = await self.db.execute(
+            text(
+                "SELECT organization_id FROM organization_members "
+                "WHERE user_id = :user_id "
+                "ORDER BY joined_at ASC LIMIT 1"
+            ),
+            {"user_id": user_id},
+        )
+        return result.scalar_one_or_none()
+
 
 class StoreService:
     def __init__(self, db: AsyncSession):

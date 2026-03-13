@@ -101,8 +101,8 @@ export default function LinkDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
           <Link
             href="/dashboard/links"
             className="mb-2 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
@@ -114,10 +114,10 @@ export default function LinkDetailPage() {
             {link.title || 'Untitled Link'}
           </h1>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
           <Link
             href={`/dashboard/links/${linkId}/qr`}
-            className="flex items-center rounded-lg border border-border px-4 py-2 text-sm hover:bg-muted"
+            className="inline-flex items-center justify-center rounded-lg border border-border px-4 py-2 text-sm hover:bg-muted"
           >
             <QrCode className="mr-2 h-4 w-4" />
             QR Code
@@ -128,7 +128,7 @@ export default function LinkDetailPage() {
                 deleteMutation.mutate()
               }
             }}
-            className="flex items-center rounded-lg border border-red-500/40 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
+            className="inline-flex items-center justify-center rounded-lg border border-red-500/40 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
           >
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
@@ -138,29 +138,40 @@ export default function LinkDetailPage() {
 
       {/* Link URL Card */}
       <div className="glass-card rounded-xl p-6 text-card-foreground">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1">
             <p className="mb-1 text-sm text-muted-foreground">Short URL</p>
-            <div className="flex items-center space-x-3">
-              <span className="text-xl font-mono text-primary">{link.short_url}</span>
-              <button
-                onClick={handleCopy}
-                className="rounded-lg p-2 transition hover:bg-muted"
-              >
-                {copied ? (
-                  <Check className="h-5 w-5 text-emerald-400" />
-                ) : (
-                  <Copy className="h-5 w-5 text-muted-foreground" />
-                )}
-              </button>
-              <a
-                href={link.short_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-lg p-2 transition hover:bg-muted"
-              >
-                <ExternalLink className="h-5 w-5 text-muted-foreground" />
-              </a>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <span className="break-all font-mono text-sm text-primary sm:text-base">
+                {link.short_url}
+              </span>
+              <div className="mt-1 flex flex-wrap items-center gap-2 sm:mt-0">
+                <button
+                  onClick={handleCopy}
+                  className="inline-flex items-center rounded-lg bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-200 hover:bg-slate-800"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="mr-1 h-4 w-4 text-emerald-400" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-1 h-4 w-4 text-slate-300" />
+                      Copy
+                    </>
+                  )}
+                </button>
+                <a
+                  href={link.short_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-lg border border-border px-3 py-2 text-xs font-medium text-slate-200 hover:bg-muted"
+                >
+                  <ExternalLink className="mr-1 h-4 w-4" />
+                  Open
+                </a>
+              </div>
             </div>
           </div>
           <span

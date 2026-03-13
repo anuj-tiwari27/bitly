@@ -136,7 +136,7 @@ export default function QRCodePage() {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Preview */}
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h2 className="mb-4 text-lg font-semibold">QR Code Preview</h2>
           
           <div
@@ -157,14 +157,14 @@ export default function QRCodePage() {
             />
           </div>
 
-          <div className="mb-6 text-center text-sm text-muted-foreground">
+          <div className="mb-6 text-center text-xs text-muted-foreground break-all">
             {link.short_url}
           </div>
 
-          <div className="flex space-x-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button
               onClick={handleDownload}
-              className="flex flex-1 items-center justify-center rounded-lg bg-primary px-4 py-3 text-primary-foreground transition hover:opacity-90"
+              className="inline-flex flex-1 items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition hover:opacity-90"
             >
               <Download className="h-4 w-4 mr-2" />
               Download PNG
@@ -172,7 +172,7 @@ export default function QRCodePage() {
             <button
               onClick={handleGenerate}
               disabled={generating}
-              className="flex items-center justify-center rounded-lg border border-border px-4 py-3 transition hover:bg-muted disabled:opacity-50"
+              className="inline-flex items-center justify-center rounded-lg border border-border px-4 py-3 text-sm font-medium transition hover:bg-muted disabled:opacity-50"
             >
               {generating ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -184,7 +184,7 @@ export default function QRCodePage() {
         </div>
 
         {/* Customization */}
-        <div className="rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h2 className="mb-4 text-lg font-semibold">
             <Palette className="mr-2 inline h-5 w-5" />
             Customize
@@ -195,7 +195,7 @@ export default function QRCodePage() {
             <label className="mb-3 block text-sm font-medium text-muted-foreground">
               Color Presets
             </label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {colorPresets.map((preset) => (
                 <button
                   key={preset.name}
@@ -231,7 +231,7 @@ export default function QRCodePage() {
           </div>
 
           {/* Custom Colors */}
-          <div className="mb-6 grid grid-cols-2 gap-4">
+          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-medium text-muted-foreground">
                 Foreground Color
@@ -247,7 +247,7 @@ export default function QRCodePage() {
                   type="text"
                   value={styleConfig.fill_color}
                   onChange={(e) => setStyleConfig({ ...styleConfig, fill_color: e.target.value })}
-                  className="flex-1 rounded-lg border border-border px-3 py-2 text-sm font-mono bg-card text-foreground"
+                  className="glass-input flex-1 rounded-lg px-3 py-2 text-sm font-mono"
                 />
               </div>
             </div>
@@ -266,7 +266,7 @@ export default function QRCodePage() {
                   type="text"
                   value={styleConfig.back_color}
                   onChange={(e) => setStyleConfig({ ...styleConfig, back_color: e.target.value })}
-                  className="flex-1 rounded-lg border border-border px-3 py-2 text-sm font-mono bg-card text-foreground"
+                  className="glass-input flex-1 rounded-lg px-3 py-2 text-sm font-mono"
                 />
               </div>
             </div>
