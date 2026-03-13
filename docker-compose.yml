@@ -7,7 +7,9 @@ services:
     container_name: bitly-traefik
     command:
       - "--api.insecure=true"
+      - "--providers.file=true"
       - "--providers.file.directory=/etc/traefik"
+      - "--providers.file.watch=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--accesslog=true"
