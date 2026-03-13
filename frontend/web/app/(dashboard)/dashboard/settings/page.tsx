@@ -12,6 +12,7 @@ export default function SettingsPage() {
     last_name: '',
   })
   const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
 
   const { data: userData } = useQuery({
     queryKey: ['user'],
@@ -36,11 +37,25 @@ export default function SettingsPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
     setSaved(false)
+    setError('')
   }
 
+  const updateProfileMutation = useMutation({
+    mutationFn: () => authApi.updateMe(formData),
+    onSuccess: () => {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+      queryClient.invalidateQueries({ queryKey: ['user'] })
+    },
+    onError: (err: any) => {
+      setError(err?.response?.data?.detail || 'Failed to update profile')
+      setSaved(false)
+    },
+  })
+
   const handleSave = () => {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    setError('')
+    updateProfileMutation.mutate()
   }
 
   return (
@@ -63,6 +78,11 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-4">
+          {error && (
+            <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-300">
+              {error}
+            </div>
+          )}
           <div>
             <label className="mb-1 block text-sm font-medium text-muted-foreground">
               Email
@@ -105,9 +125,15 @@ export default function SettingsPage() {
           <div className="flex justify-end pt-4">
             <button
               onClick={handleSave}
+              disabled={updateProfileMutation.isPending}
               className="flex items-center rounded-lg bg-primary px-6 py-3 text-primary-foreground transition hover:opacity-90"
             >
-              {saved ? (
+              {updateProfileMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : saved ? (
                 <>Saved!</>
               ) : (
                 <>

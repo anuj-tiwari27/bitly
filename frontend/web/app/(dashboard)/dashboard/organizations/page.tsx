@@ -234,21 +234,16 @@ export default function OrganizationsPage() {
                   <tr className="border-b border-slate-800 text-xs uppercase text-muted-foreground">
                     <th className="py-2 pr-4 text-left">Member</th>
                     <th className="py-2 pr-4 text-left">Role</th>
-                    <th className="py-2 pr-4 text-left">Status</th>
+                    <th className="py-2 pr-4 text-left">Joined</th>
                     <th className="py-2 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {members.map((member: any) => (
-                    <tr key={member.id} className="border-b border-slate-800 last:border-0">
+                    <tr key={member.user_id} className="border-b border-slate-800 last:border-0">
                       <td className="py-2 pr-4">
                         <div className="flex flex-col">
                           <span className="text-sm text-card-foreground">{member.email}</span>
-                          {member.first_name && (
-                            <span className="text-xs text-muted-foreground">
-                              {member.first_name} {member.last_name || ''}
-                            </span>
-                          )}
                         </div>
                       </td>
                       <td className="py-2 pr-4">
@@ -260,7 +255,7 @@ export default function OrganizationsPage() {
                         </div>
                       </td>
                       <td className="py-2 pr-4 text-xs text-muted-foreground">
-                        {member.status === 'pending' ? 'Pending invite' : 'Active'}
+                        {member.joined_at ? new Date(member.joined_at).toLocaleDateString() : '—'}
                       </td>
                       <td className="py-2 text-right">
                         <button
@@ -270,7 +265,7 @@ export default function OrganizationsPage() {
                                 `Remove ${member.email} from ${org?.name || 'this organization'}?`,
                               )
                             ) {
-                              removeMutation.mutate(member.id)
+                              removeMutation.mutate(member.user_id)
                             }
                           }}
                           className="inline-flex items-center rounded-lg px-2 py-1 text-xs text-red-300 hover:bg-red-500/10"

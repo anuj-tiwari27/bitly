@@ -237,12 +237,19 @@ export default function QRCodePage() {
                 Foreground Color
               </label>
               <div className="flex items-center space-x-2">
-                <input
-                  type="color"
-                  value={styleConfig.fill_color}
-                  onChange={(e) => setStyleConfig({ ...styleConfig, fill_color: e.target.value })}
-                  className="w-10 h-10 rounded cursor-pointer"
-                />
+                <label className="relative h-11 w-11 overflow-hidden rounded-lg border border-border bg-slate-950/60 shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
+                  <span
+                    className="absolute inset-0"
+                    style={{ backgroundColor: styleConfig.fill_color }}
+                  />
+                  <input
+                    type="color"
+                    value={styleConfig.fill_color}
+                    onChange={(e) => setStyleConfig({ ...styleConfig, fill_color: e.target.value })}
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    aria-label="Foreground color"
+                  />
+                </label>
                 <input
                   type="text"
                   value={styleConfig.fill_color}
@@ -256,12 +263,19 @@ export default function QRCodePage() {
                 Background Color
               </label>
               <div className="flex items-center space-x-2">
-                <input
-                  type="color"
-                  value={styleConfig.back_color}
-                  onChange={(e) => setStyleConfig({ ...styleConfig, back_color: e.target.value })}
-                  className="w-10 h-10 rounded cursor-pointer"
-                />
+                <label className="relative h-11 w-11 overflow-hidden rounded-lg border border-border bg-slate-950/60 shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
+                  <span
+                    className="absolute inset-0"
+                    style={{ backgroundColor: styleConfig.back_color }}
+                  />
+                  <input
+                    type="color"
+                    value={styleConfig.back_color}
+                    onChange={(e) => setStyleConfig({ ...styleConfig, back_color: e.target.value })}
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    aria-label="Background color"
+                  />
+                </label>
                 <input
                   type="text"
                   value={styleConfig.back_color}

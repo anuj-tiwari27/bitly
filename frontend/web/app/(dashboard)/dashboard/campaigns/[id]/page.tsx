@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   ArrowLeft,
   Calendar,
@@ -11,8 +11,9 @@ import {
   Users,
   Link2,
   Clock,
+  Plus,
 } from 'lucide-react'
-import { campaignsApi, analyticsApi } from '@/lib/api'
+import { campaignsApi, analyticsApi, linksApi } from '@/lib/api'
 import { formatDate, formatNumber } from '@/lib/utils'
 import {
   AreaChart,
@@ -30,6 +31,9 @@ export default function CampaignDetailPage() {
   const params = useParams()
   const campaignId = params.id as string
   const [days, setDays] = useState<DateRange>(30)
+  const queryClient = useQueryClient()
+  const [linkSearch, setLinkSearch] = useState('')
+  const [selectedLinkId, setSelectedLinkId] = useState('')
 
   const { data: campaignRes, isLoading } = useQuery({
     queryKey: ['campaign', campaignId],
@@ -40,6 +44,11 @@ export default function CampaignDetailPage() {
     queryKey: ['campaign-analytics', campaignId, days],
     queryFn: () => analyticsApi.campaignAnalytics(campaignId, days),
     enabled: !!campaignId,
+  })
+
+  const { data: linksRes, isLoading: linksLoading } = useQuery({
+    queryKey: ['links', { search: linkSearch }],
+    queryFn: () => linksApi.list({ search: linkSearch || undefined, page_size: 100 }),
   })
 
   const campaign = campaignRes?.data
@@ -56,6 +65,21 @@ export default function CampaignDetailPage() {
     top_links: [],
     devices: [],
   }
+
+  const allLinks = linksRes?.data?.items || []
+  const availableLinks = useMemo(
+    () => allLinks.filter((l: any) => !l.campaign_id || l.campaign_id !== campaignId),
+    [allLinks, campaignId],
+  )
+
+  const addExistingMutation = useMutation({
+    mutationFn: (linkId: string) => linksApi.update(linkId, { campaign_id: campaignId }),
+    onSuccess: () => {
+      setSelectedLinkId('')
+      queryClient.invalidateQueries({ queryKey: ['campaign-analytics', campaignId] })
+      queryClient.invalidateQueries({ queryKey: ['links'] })
+    },
+  })
 
   if (isLoading) {
     return (
@@ -158,6 +182,68 @@ export default function CampaignDetailPage() {
           <div className="rounded-lg bg-slate-900/70 p-4">
             <p className="text-xs text-muted-foreground">Created</p>
             <p className="mt-1 text-sm">{formatDate(campaign.created_at)}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Add / Create links in campaign */}
+      <div className="glass-card rounded-xl p-6 text-card-foreground">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">Links in this campaign</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Create a new link for this campaign or add an existing one.
+            </p>
+          </div>
+          <Link
+            href={`/dashboard/links/new?campaign_id=${campaignId}`}
+            className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Create Link
+          </Link>
+        </div>
+
+        <div className="mt-4 grid gap-3 md:grid-cols-[1.2fr,1fr,auto]">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
+              Search existing links
+            </label>
+            <input
+              value={linkSearch}
+              onChange={(e) => setLinkSearch(e.target.value)}
+              placeholder="Search by title, URL, short code..."
+              className="glass-input w-full rounded-lg px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
+              Select link to add
+            </label>
+            <select
+              value={selectedLinkId}
+              onChange={(e) => setSelectedLinkId(e.target.value)}
+              className="glass-input w-full rounded-lg px-3 py-2 text-sm"
+              disabled={linksLoading}
+            >
+              <option value="">
+                {linksLoading ? 'Loading links...' : availableLinks.length ? 'Choose a link' : 'No links found'}
+              </option>
+              {availableLinks.slice(0, 100).map((l: any) => (
+                <option key={l.id} value={l.id}>
+                  {(l.title || l.short_code) + ' — ' + l.short_code}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={() => selectedLinkId && addExistingMutation.mutate(selectedLinkId)}
+              disabled={!selectedLinkId || addExistingMutation.isPending}
+              className="inline-flex w-full items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-medium transition hover:bg-muted disabled:opacity-60 md:w-auto"
+            >
+              Add to campaign
+            </button>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link2, ArrowLeft, Loader2 } from 'lucide-react'
 import Link from 'next/link'
@@ -9,6 +9,7 @@ import { linksApi, campaignsApi } from '@/lib/api'
 
 export default function NewLinkPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [formData, setFormData] = useState({
     destination_url: '',
     title: '',
@@ -20,6 +21,14 @@ export default function NewLinkPage() {
     max_clicks: '',
   })
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    const campaign_id = searchParams.get('campaign_id')
+    if (campaign_id) {
+      setFormData((prev) => ({ ...prev, campaign_id }))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const { data: campaignsData } = useQuery({
     queryKey: ['campaigns'],
@@ -49,6 +58,14 @@ export default function NewLinkPage() {
     if (!formData.destination_url) {
       setError('Destination URL is required')
       return
+    }
+
+    if (formData.password) {
+      const bytes = new TextEncoder().encode(formData.password).length
+      if (bytes > 72) {
+        setError('Password cannot be longer than 72 bytes. Please use a shorter password.')
+        return
+      }
     }
 
     const data: any = {

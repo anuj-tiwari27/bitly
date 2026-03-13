@@ -299,7 +299,7 @@ export default function LinkDetailPage() {
                     <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                 <XAxis 
                   dataKey="date" 
                   stroke="#9CA3AF"
@@ -309,8 +309,8 @@ export default function LinkDetailPage() {
                 <YAxis stroke="#9CA3AF" fontSize={12} />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    border: '1px solid #E5E7EB',
+                    backgroundColor: '#020617', 
+                    border: '1px solid #1e293b',
                     borderRadius: '8px',
                   }}
                   labelFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
@@ -347,9 +347,9 @@ export default function LinkDetailPage() {
         <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h3 className="mb-4 font-semibold">Devices</h3>
           {analytics.devices?.length > 0 ? (
-            <div className="flex items-center">
-              <div className="w-1/2">
-                <ResponsiveContainer width="100%" height={150}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="w-full sm:w-1/2">
+                <ResponsiveContainer width="100%" height={170}>
                   <PieChart>
                     <Pie
                       data={analytics.devices}
@@ -368,7 +368,7 @@ export default function LinkDetailPage() {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="w-1/2 space-y-2">
+              <div className="w-full space-y-2 sm:w-1/2">
                 {analytics.devices.map((device: any, index: number) => {
                   const Icon = deviceIcons[device.device_type] || Monitor
                   const total = analytics.devices.reduce((sum: number, d: any) => sum + d.clicks, 0)
@@ -402,10 +402,10 @@ export default function LinkDetailPage() {
         <div className="glass-card rounded-xl p-6 text-card-foreground">
           <h3 className="mb-4 font-semibold">Browsers</h3>
           {analytics.browsers?.length > 0 ? (
-            <div className="h-40">
+            <div className="h-52">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={analytics.browsers.slice(0, 5)} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" horizontal={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" horizontal={false} />
                   <XAxis type="number" stroke="#9CA3AF" fontSize={12} />
                   <YAxis 
                     type="category" 

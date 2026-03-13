@@ -55,6 +55,7 @@ export const authApi = {
     api.post('/auth/refresh', { refresh_token: refreshToken }),
   logout: () => api.post('/auth/logout'),
   me: () => api.get('/users/me'),
+  updateMe: (data: { first_name?: string; last_name?: string }) => api.put('/users/me', data),
 }
 
 // Links API

@@ -26,6 +26,10 @@ def generate_short_code(length: int = 7) -> str:
 
 
 def hash_password(password: str) -> str:
+    # bcrypt only uses the first 72 bytes of a password; enforce a clear error
+    # so users don't think the password is accepted when it is silently truncated.
+    if len(password.encode("utf-8")) > 72:
+        raise ValueError("Password cannot be longer than 72 bytes. Please use a shorter password.")
     return pwd_context.hash(password)
 
 

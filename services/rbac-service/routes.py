@@ -753,7 +753,7 @@ async def list_organization_members(
     ]
 
 
-@organizations_router.post("/{org_id}/invite", response_model=OrganizationMemberResponse)
+@organizations_router.post("/{org_id}/invite", response_model=InvitationResponse)
 async def invite_member_to_organization(
     org_id: UUID,
     data: InvitationCreate,

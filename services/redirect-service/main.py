@@ -7,7 +7,7 @@ import asyncio
 import hashlib
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 from typing import Optional
 from urllib.parse import urlparse, parse_qs
@@ -112,7 +112,11 @@ def is_link_expired(link_data: dict) -> bool:
         expires = datetime.fromisoformat(link_data["expires_at"])
     except Exception:
         return False
-    return datetime.utcnow() > expires
+    # Normalize timezone-awareness to avoid TypeError (naive vs aware)
+    now = datetime.now(timezone.utc)
+    if expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    return now > expires
 
 
 async def get_link_from_db(short_code: str) -> Optional[dict]:
