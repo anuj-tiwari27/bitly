@@ -15,7 +15,7 @@ import {
   Shield,
   Building2,
 } from 'lucide-react'
-import { authApi } from '@/lib/api'
+import { authApi, organizationsApi } from '@/lib/api'
 
 const baseNavigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -34,6 +34,7 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const [user, setUser] = useState<any>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [hasOrganization, setHasOrganization] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('access_token')
@@ -43,7 +44,19 @@ export default function DashboardLayout({
     }
 
     authApi.me()
-      .then((res) => setUser(res.data))
+      .then(async (res) => {
+        setUser(res.data)
+        try {
+          const orgRes = await organizationsApi.list()
+          const data: any = orgRes.data
+          const items = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : []
+          if (items.length > 0) {
+            setHasOrganization(true)
+          }
+        } catch {
+          // Ignore organization loading errors for layout
+        }
+      })
       .catch(() => {
         localStorage.removeItem('access_token')
         router.push('/login')
@@ -69,8 +82,9 @@ export default function DashboardLayout({
 
   const isAdmin = Array.isArray(user.roles) && user.roles.includes('admin')
   const isOrgManager =
-    Array.isArray(user.roles) &&
-    (user.roles.includes('admin') || user.roles.includes('store_manager'))
+    (Array.isArray(user.roles) &&
+      (user.roles.includes('admin') || user.roles.includes('store_manager'))) ||
+    hasOrganization
   if (pathname.startsWith('/dashboard/admin') && !isAdmin) {
     router.replace('/dashboard')
     return (

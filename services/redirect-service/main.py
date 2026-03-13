@@ -105,6 +105,16 @@ async def set_link_in_cache(short_code: str, link_data: dict) -> None:
         logger.error(f"Redis error: {e}")
 
 
+def is_link_expired(link_data: dict) -> bool:
+    if not link_data.get("expires_at"):
+        return False
+    try:
+        expires = datetime.fromisoformat(link_data["expires_at"])
+    except Exception:
+        return False
+    return datetime.utcnow() > expires
+
+
 async def get_link_from_db(short_code: str) -> Optional[dict]:
     """Get link data from database."""
     async with async_session_maker() as session:
@@ -240,38 +250,57 @@ async def redirect(short_code: str, request: Request):
     await enforce_rate_limit(client_ip, short_code)
     
     link_data = await get_link_from_cache(short_code)
-    
+
     if link_data is None:
         link_data = await get_link_from_db(short_code)
-        
+
         if link_data is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Link not found"
             )
-        
-        await set_link_in_cache(short_code, link_data)
-    
+
+    # If cached data would block the user (inactive/expired/limit),
+    # re-check the DB to avoid stale-cache issues after reactivation/updates.
+    cached_blocks = (
+        (link_data is not None and not link_data.get("is_active", True))
+        or is_link_expired(link_data)
+        or (
+            link_data.get("max_clicks") is not None
+            and link_data.get("click_count") is not None
+            and link_data["click_count"] >= link_data["max_clicks"]
+        )
+    )
+    if cached_blocks:
+        fresh = await get_link_from_db(short_code)
+        if fresh is not None:
+            link_data = fresh
+
     if not link_data["is_active"]:
+        # Do not cache inactive state; it may be reactivated.
         raise HTTPException(
             status_code=status.HTTP_410_GONE,
             detail="Link is no longer active"
         )
-    
-    if link_data["expires_at"]:
-        expires = datetime.fromisoformat(link_data["expires_at"])
-        if datetime.utcnow() > expires:
-            raise HTTPException(
-                status_code=status.HTTP_410_GONE,
-                detail="Link has expired"
-            )
-    
+
+    if is_link_expired(link_data):
+        # Do not cache expired state; expiration may be extended/cleared.
+        raise HTTPException(
+            status_code=status.HTTP_410_GONE,
+            detail="Link has expired"
+        )
+
     if link_data["max_clicks"]:
         if link_data["click_count"] >= link_data["max_clicks"]:
+            # Do not cache limit-reached state; limit may be edited.
             raise HTTPException(
                 status_code=status.HTTP_410_GONE,
                 detail="Link click limit reached"
             )
+
+    # Cache only "good" links that should redirect.
+    if redis_client is not None:
+        await set_link_in_cache(short_code, link_data)
     
     if link_data["has_password"]:
         return HTMLResponse(
@@ -339,11 +368,17 @@ async def verify_password(short_code: str, request: Request):
     password = form_data.get("password", "")
     
     link_data = await get_link_from_cache(short_code)
-    if link_data is None:
+    if link_data is None or (link_data is not None and (not link_data.get("is_active", True) or is_link_expired(link_data))):
         link_data = await get_link_from_db(short_code)
     
     if link_data is None:
         raise HTTPException(status_code=404, detail="Link not found")
+
+    if not link_data.get("is_active", True):
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Link is no longer active")
+
+    if is_link_expired(link_data):
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Link has expired")
     
     async with async_session_maker() as session:
         result = await session.execute(

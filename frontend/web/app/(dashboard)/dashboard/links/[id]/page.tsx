@@ -445,7 +445,9 @@ export default function LinkDetailPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{getFlagEmoji(country.country_code)}</span>
                       <span className="text-sm text-card-foreground">
-                        {country.country_name}
+                        {(!country.country_name || country.country_name.toLowerCase() === 'unknown')
+                          ? 'Global'
+                          : country.country_name}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">

@@ -26,6 +26,13 @@ const deviceIcons: Record<string, any> = {
 
 type DateRange = '7d' | '14d' | '30d' | '90d'
 
+function formatHourLabel(hour: number): string {
+  const normalized = ((hour % 24) + 24) % 24
+  const displayHour = ((normalized + 11) % 12) + 1
+  const suffix = normalized < 12 ? 'AM' : 'PM'
+  return `${displayHour}${suffix}`
+}
+
 export default function AnalyticsPage() {
   const [dateRange, setDateRange] = useState<DateRange>('30d')
   
@@ -308,11 +315,15 @@ export default function AnalyticsPage() {
                   dataKey="hour" 
                   stroke="#9CA3AF" 
                   fontSize={11}
-                  tickFormatter={(h) => `${h}:00`}
+                  tickFormatter={(h) => formatHourLabel(h as number)}
                 />
                 <YAxis stroke="#9CA3AF" fontSize={12} />
                 <Tooltip 
-                  labelFormatter={(h) => `${h}:00 - ${h}:59`}
+                  labelFormatter={(h) => {
+                    const start = formatHourLabel(h as number)
+                    const end = formatHourLabel(((h as number) + 1) % 24)
+                    return `${start} - ${end}`
+                  }}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB' }}
                 />
                 <Bar dataKey="clicks" fill="#3B82F6" radius={[4, 4, 0, 0]} />
@@ -518,7 +529,9 @@ export default function AnalyticsPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{getFlagEmoji(country.country_code)}</span>
                     <span className="text-sm text-card-foreground">
-                      {country.country_name}
+                      {(!country.country_name || country.country_name.toLowerCase() === 'unknown')
+                        ? 'Global'
+                        : country.country_name}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
