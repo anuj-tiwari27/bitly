@@ -62,8 +62,11 @@ async def create_campaign(
     db: AsyncSession = Depends(get_db)
 ):
     service = CampaignService(db)
-    campaign = await service.create(user_id, data)
-    return campaign_to_response(campaign)
+    try:
+        campaign = await service.create(user_id, data)
+        return campaign_to_response(campaign)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
 
 @router.get("", response_model=CampaignListResponse)

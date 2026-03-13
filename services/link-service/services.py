@@ -155,6 +155,31 @@ class LinkService:
         
         # Organization is immutable from the API surface
         update_data.pop("organization_id", None)
+
+        # Validate campaign assignment if campaign_id is being changed
+        if "campaign_id" in update_data:
+            campaign_id = update_data.get("campaign_id")
+            if campaign_id is None:
+                # allow detaching from campaign
+                pass
+            else:
+                # Ensure the campaign exists, belongs to the same user, and matches org scope
+                result = await self.db.execute(
+                    text(
+                        "SELECT user_id, organization_id FROM campaigns WHERE id = :id"
+                    ),
+                    {"id": campaign_id},
+                )
+                row = result.first()
+                if row is None:
+                    raise ValueError("Campaign not found")
+                campaign_user_id, campaign_org_id = row[0], row[1]
+                if str(campaign_user_id) != str(link.user_id):
+                    raise ValueError("You do not have access to this campaign")
+                # If either side is scoped to an org, both must match
+                if (campaign_org_id is not None) or (link.organization_id is not None):
+                    if str(campaign_org_id) != str(link.organization_id):
+                        raise ValueError("Campaign organization does not match this link")
         
         # Handle password separately
         if 'password' in update_data:

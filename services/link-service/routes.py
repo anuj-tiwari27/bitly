@@ -136,7 +136,10 @@ async def update_link(
             detail="Link not found"
         )
     
-    link = await service.update(link, data)
+    try:
+        link = await service.update(link, data)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     
     return link_to_response(link)
 
