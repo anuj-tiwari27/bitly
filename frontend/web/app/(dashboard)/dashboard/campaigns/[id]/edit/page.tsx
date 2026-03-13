@@ -22,7 +22,7 @@ export default function EditCampaignPage() {
   })
   const [error, setError] = useState('')
 
-  const { data: campaignRes, isLoading } = useQuery({
+  const { data: campaignRes, isLoading } = useQuery<{ data: any }>({
     queryKey: ['campaign', campaignId],
     queryFn: () => campaignsApi.get(campaignId),
   })
