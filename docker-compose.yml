@@ -15,6 +15,7 @@ services:
       - "--log.level=INFO"
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
+      - DOCKER_API_VERSION=1.40
     ports:
       - "80:80"
       - "443:443"
@@ -184,6 +185,8 @@ services:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
+      - traefik.http.routers.myapp.rule=Host(thelittleurl.com, www.thelittleurl.com)
+      - traefik.http.routers.myapp.tls.certresolver=letsencrypt
       - "traefik.http.routers.rbac.rule=PathPrefix(`/api/auth`) || PathPrefix(`/api/users`) || PathPrefix(`/api/roles`)"
       - "traefik.http.routers.rbac.entrypoints=web"
       - "traefik.http.services.rbac.loadbalancer.server.port=8000"
