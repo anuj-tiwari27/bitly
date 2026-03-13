@@ -15,7 +15,6 @@ services:
       - "--log.level=INFO"
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - DOCKER_API_VERSION=1.40
     ports:
       - "80:80"
       - "443:443"
