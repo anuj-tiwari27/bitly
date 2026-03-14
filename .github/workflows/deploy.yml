@@ -21,7 +21,7 @@ jobs:
       - name: Install frontend deps and lint
         run: |
           cd frontend/web
-          npm ci
+          npm install
           npm run lint
 
       - name: Deploy over SSH
