@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Link2, Mail, Lock, User, Loader2, Building2, Eye, EyeOff } from 'lucide-react'
+import { Link2, Mail, Lock, User, Loader2, Building2, Eye, EyeOff, Globe } from 'lucide-react'
 import { authApi } from '@/lib/api'
 
 export default function RegisterPage() {
@@ -195,7 +195,7 @@ export default function RegisterPage() {
                   First name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/85" />
+                  <User className="absolute left-3 top-1/2 z-10 -translate-y-1/2 h-5 w-5 text-[#738194] pointer-events-none" />
                   <input
                     id="first_name"
                     name="first_name"
@@ -208,18 +208,21 @@ export default function RegisterPage() {
                 </div>
               </div>
               <div>
-              <label htmlFor="last_name" className="block text-sm font-medium text-muted-foreground mb-1">
+                <label htmlFor="last_name" className="block text-sm font-medium text-muted-foreground mb-1">
                   Last name
                 </label>
-                <input
-                  id="last_name"
-                  name="last_name"
-                  type="text"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                  className="glass-input w-full rounded-lg px-4 py-3"
-                  placeholder="Doe"
-                />
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 z-10 -translate-y-1/2 h-5 w-5 text-[#738194] pointer-events-none" />
+                  <input
+                    id="last_name"
+                    name="last_name"
+                    type="text"
+                    value={formData.last_name}
+                    onChange={handleChange}
+                    className="glass-input w-full rounded-lg px-4 py-3 pl-10"
+                    placeholder="Doe"
+                  />
+                </div>
               </div>
             </div>
 
@@ -229,30 +232,36 @@ export default function RegisterPage() {
                   <label htmlFor="name" className="block text-sm font-medium text-muted-foreground mb-1">
                     Organization name
                   </label>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    value={organization.name}
-                    onChange={handleOrgChange}
-                    required
-                    className="glass-input w-full rounded-lg px-4 py-3"
-                    placeholder="Acme Inc."
-                  />
+                  <div className="relative">
+                    <Building2 className="absolute left-3 top-1/2 z-10 -translate-y-1/2 h-5 w-5 text-[#738194] pointer-events-none" />
+                    <input
+                      id="name"
+                      name="name"
+                      type="text"
+                      value={organization.name}
+                      onChange={handleOrgChange}
+                      required
+                      className="glass-input w-full rounded-lg px-4 py-3 pl-10"
+                      placeholder="Acme Inc."
+                    />
+                  </div>
                 </div>
                 <div>
                   <label htmlFor="website" className="block text-sm font-medium text-muted-foreground mb-1">
                     Website (optional)
                   </label>
-                  <input
-                    id="website"
-                    name="website"
-                    type="text"
-                    value={organization.website}
-                    onChange={handleOrgChange}
-                    className="glass-input w-full rounded-lg px-4 py-3"
-                    placeholder="https://example.com"
-                  />
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-1/2 z-10 -translate-y-1/2 h-5 w-5 text-[#738194] pointer-events-none" />
+                    <input
+                      id="website"
+                      name="website"
+                      type="text"
+                      value={organization.website}
+                      onChange={handleOrgChange}
+                      className="glass-input w-full rounded-lg px-4 py-3 pl-10"
+                      placeholder="https://example.com"
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -263,7 +272,7 @@ export default function RegisterPage() {
               </label>
               <div className="space-y-2">
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/85" />
+                  <Mail className="absolute left-3 top-1/2 z-10 -translate-y-1/2 h-5 w-5 text-[#738194] pointer-events-none" />
                   <input
                     id="email"
                     name="email"
@@ -331,7 +340,7 @@ export default function RegisterPage() {
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/85" />
+                <Lock className="absolute left-3 top-1/2 z-10 -translate-y-1/2 h-5 w-5 text-[#738194] pointer-events-none" />
                 <input
                   id="password"
                   name="password"
@@ -345,7 +354,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/85 hover:text-white focus:outline-none"
+                  className="absolute right-3 top-1/2 z-10 -translate-y-1/2 text-[#738194] hover:text-[#738194] focus:outline-none"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -361,7 +370,7 @@ export default function RegisterPage() {
                 Confirm password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/85" />
+                <Lock className="absolute left-3 top-1/2 z-10 -translate-y-1/2 h-5 w-5 text-[#738194] pointer-events-none" />
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -375,7 +384,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/85 hover:text-white focus:outline-none"
+                  className="absolute right-3 top-1/2 z-10 -translate-y-1/2 text-[#738194] hover:text-[#738194] focus:outline-none"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}

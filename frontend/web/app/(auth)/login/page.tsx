@@ -113,7 +113,7 @@ export default function LoginPage() {
                 Email address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/85" />
+                <Mail className="absolute left-3 top-1/2 z-10 -translate-y-1/2 h-5 w-5 text-[#738194] pointer-events-none" />
                 <input
                   id="email"
                   type="email"
@@ -131,7 +131,7 @@ export default function LoginPage() {
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/85" />
+                <Lock className="absolute left-3 top-1/2 z-10 -translate-y-1/2 h-5 w-5 text-[#738194] pointer-events-none" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -144,7 +144,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/85 hover:text-white focus:outline-none"
+                  className="absolute right-3 top-1/2 z-10 -translate-y-1/2 text-[#738194] hover:text-[#738194] focus:outline-none"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}

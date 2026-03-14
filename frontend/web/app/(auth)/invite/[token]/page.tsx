@@ -141,7 +141,7 @@ export default function InviteAcceptPage() {
                 First name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
+                <User className="absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-[#738194] pointer-events-none" />
                 <input
                   type="text"
                   name="first_name"
@@ -172,7 +172,7 @@ export default function InviteAcceptPage() {
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
+              <Lock className="absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-[#738194] pointer-events-none" />
               <input
                 type="password"
                 name="password"
@@ -193,7 +193,7 @@ export default function InviteAcceptPage() {
               Confirm password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
+              <Lock className="absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-[#738194] pointer-events-none" />
               <input
                 type="password"
                 name="confirmPassword"
