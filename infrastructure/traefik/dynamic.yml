@@ -1,7 +1,7 @@
 http:
   routers:
     frontend:
-      rule: "Host(`thelittleurl.com`,`www.thelittleurl.com`)"
+      rule: "Host(`thelittleurl.com`) || Host(`www.thelittleurl.com`)"
       entryPoints:
         - web
       service: frontend
