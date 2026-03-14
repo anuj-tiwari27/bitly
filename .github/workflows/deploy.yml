@@ -18,6 +18,8 @@ jobs:
         with:
           node-version: 20
 
+#frontend deps
+
       - name: Install frontend deps and lint
         run: |
           cd frontend/web
