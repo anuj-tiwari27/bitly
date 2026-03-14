@@ -396,6 +396,8 @@ services:
       context: ./frontend/web
       dockerfile: Dockerfile
     container_name: bitly-frontend
+    ports:
+      - "3000:3000"
     environment:
       - RBAC_SERVICE_URL=http://rbac-service:8000
       - LINK_SERVICE_URL=http://link-service:8000
