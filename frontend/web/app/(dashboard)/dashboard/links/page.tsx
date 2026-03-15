@@ -33,9 +33,11 @@ export default function LinksPage() {
   const [search, setSearch] = useState('')
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['links', { search }],
     queryFn: () => linksApi.list({ search: search || undefined, page_size: 100 }),
+    refetchInterval: 10_000,
+    refetchOnWindowFocus: true,
   })
 
   const deleteMutation = useMutation({
@@ -46,7 +48,32 @@ export default function LinksPage() {
   const toggleActiveMutation = useMutation({
     mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
       linksApi.update(id, { is_active }),
-    onSuccess: (_, { id }) => {
+    onMutate: async ({ id, is_active }) => {
+      await queryClient.cancelQueries({ queryKey: ['links'] })
+
+      const previous = queryClient.getQueryData(['links', { search }])
+
+      queryClient.setQueryData(['links', { search }], (old: any) => {
+        if (!old?.data?.items) return old
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            items: old.data.items.map((l: any) =>
+              l.id === id ? { ...l, is_active } : l,
+            ),
+          },
+        }
+      })
+
+      return { previous }
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['links', { search }], context.previous)
+      }
+    },
+    onSettled: (_data, _error, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['links'] })
       queryClient.invalidateQueries({ queryKey: ['link', id] })
       queryClient.invalidateQueries({ queryKey: ['link-analytics', id] })
@@ -73,10 +100,19 @@ export default function LinksPage() {
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-foreground">Links</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage short links and document shares
+            Manage short links and document shares. Status updates are applied instantly and
+            data stays in sync every few seconds.
           </p>
         </div>
         <div className="flex flex-wrap gap-2 sm:justify-end">
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="inline-flex items-center rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isFetching ? 'Refreshing…' : 'Refresh'}
+          </button>
           <Link
             href="/dashboard/links/upload-document"
             className={`flex items-center px-4 py-2 rounded-lg transition ${

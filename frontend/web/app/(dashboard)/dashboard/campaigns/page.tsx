@@ -22,9 +22,11 @@ export default function CampaignsPage() {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['campaigns', { search }],
     queryFn: () => campaignsApi.list({ search: search || undefined, page_size: 50 }),
+    refetchInterval: 10_000,
+    refetchOnWindowFocus: true,
   })
 
   const deleteMutation = useMutation({
@@ -40,16 +42,26 @@ export default function CampaignsPage() {
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-foreground">Campaigns</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Organize your links into campaigns
+            Organize your links into campaigns. Analytics and counts refresh automatically every few seconds.
           </p>
         </div>
-        <Link
-          href="/dashboard/campaigns/new"
-          className="flex items-center rounded-lg bg-primary px-4 py-2 text-primary-foreground transition hover:opacity-90"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          New Campaign
-        </Link>
+        <div className="flex flex-wrap gap-2 sm:justify-end">
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="inline-flex items-center rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isFetching ? 'Refreshing…' : 'Refresh'}
+          </button>
+          <Link
+            href="/dashboard/campaigns/new"
+            className="flex items-center rounded-lg bg-primary px-4 py-2 text-primary-foreground transition hover:opacity-90"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            New Campaign
+          </Link>
+        </div>
       </div>
 
       {/* Search */}
