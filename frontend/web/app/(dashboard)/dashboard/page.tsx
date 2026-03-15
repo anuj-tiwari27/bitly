@@ -131,17 +131,15 @@ export default function DashboardPage() {
             </div>
           ) : (
             links.map((link: any) => (
-              <div
+              <Link
                 key={link.id}
-                className="flex items-center justify-between p-4 transition hover:bg-muted"
+                href={`/dashboard/links/${link.id}`}
+                className="flex items-center justify-between p-4 transition hover:bg-muted block"
               >
                 <div className="flex-1 min-w-0">
-                  <Link
-                    href={`/dashboard/links/${link.id}`}
-                    className="text-sm font-medium text-card-foreground hover:text-primary"
-                  >
+                  <p className="text-sm font-medium text-card-foreground">
                     {link.title || truncateUrl(link.destination_url, 40)}
-                  </Link>
+                  </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {link.short_url}
                   </p>
@@ -159,7 +157,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           )}
         </div>

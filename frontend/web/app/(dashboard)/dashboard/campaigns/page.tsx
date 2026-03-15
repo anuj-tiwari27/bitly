@@ -11,11 +11,11 @@ import { campaignsApi } from '@/lib/api'
 import { formatNumber, formatDate } from '@/lib/utils'
 
 const statusColors: Record<string, string> = {
-  draft: 'bg-gray-100 text-gray-800',
-  active: 'bg-green-100 text-green-800',
-  paused: 'bg-yellow-100 text-yellow-800',
-  completed: 'bg-blue-100 text-blue-800',
-  archived: 'bg-red-100 text-red-800',
+  draft: 'bg-slate-500/20 text-slate-300',
+  active: 'bg-emerald-500/20 text-emerald-300',
+  paused: 'bg-amber-500/20 text-amber-300',
+  completed: 'bg-blue-500/20 text-blue-300',
+  archived: 'bg-red-500/20 text-red-400',
 }
 
 export default function CampaignsPage() {
@@ -91,8 +91,8 @@ export default function CampaignsPage() {
               key={campaign.id}
               className="glass-card rounded-xl text-card-foreground transition hover:shadow-lg"
             >
-              <div className="p-6">
-                <div className="mb-4 flex items-start justify-between">
+              <div className="p-6 flex flex-col">
+                <div className="mb-3 flex items-start justify-between">
                   <Link
                     href={`/dashboard/campaigns/${campaign.id}`}
                     className="text-lg font-semibold hover:text-primary"
@@ -100,7 +100,7 @@ export default function CampaignsPage() {
                     {campaign.name}
                   </Link>
                   <span
-                    className={`px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                    className={`shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
                       statusColors[campaign.status] || statusColors.draft
                     }`}
                   >
@@ -108,11 +108,11 @@ export default function CampaignsPage() {
                   </span>
                 </div>
 
-                {campaign.description && (
-                  <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
-                    {campaign.description}
+                <div className="mb-4 min-h-[2.5rem]">
+                  <p className="line-clamp-2 text-sm text-muted-foreground">
+                    {campaign.description || '\u00A0'}
                   </p>
-                )}
+                </div>
 
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                   <div className="flex items-center">

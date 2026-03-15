@@ -1,7 +1,7 @@
 """Business logic services for Link service."""
 
 import secrets
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List, Tuple
 from uuid import UUID
 
@@ -160,17 +160,15 @@ class LinkService:
         # Organization is immutable from the API surface
         update_data.pop("organization_id", None)
 
-        # If we're re-activating a link, ensure we don't keep a past expiry that
-        # would block redirects (common when "inactive" was implemented by setting
-        # expires_at in the past).
+        # If we're re-activating a link, clear past expiry so redirect works again.
         if update_data.get("is_active") is True and link.is_active is False:
-            if "expires_at" not in update_data:
-                try:
-                    if link.expires_at is not None and link.expires_at <= datetime.utcnow():
-                        link.expires_at = None
-                except Exception:
-                    # If timezone-aware comparisons fail, keep existing expires_at
-                    pass
+            if "expires_at" not in update_data and link.expires_at is not None:
+                now = datetime.now(timezone.utc)
+                exp = link.expires_at
+                if exp.tzinfo is None:
+                    exp = exp.replace(tzinfo=timezone.utc)
+                if exp <= now:
+                    link.expires_at = None
 
         # Validate campaign assignment if campaign_id is being changed
         if "campaign_id" in update_data:

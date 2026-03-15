@@ -296,9 +296,15 @@ async def get_overview(
             {"user_id": user_id}
         )[0][0]
         
-        unique_visitors_prev = client.execute(
+        # Unique visitors in comparable periods for growth (week-over-week)
+        unique_visitors_this_week = client.execute(
             """SELECT uniqExact(ip_hash) FROM click_events 
-               WHERE user_id = %(user_id)s AND date >= today() - 60 AND date < today() - 30""",
+               WHERE user_id = %(user_id)s AND date >= today() - 7""",
+            {"user_id": user_id}
+        )[0][0]
+        unique_visitors_last_week = client.execute(
+            """SELECT uniqExact(ip_hash) FROM click_events 
+               WHERE user_id = %(user_id)s AND date >= today() - 14 AND date < today() - 7""",
             {"user_id": user_id}
         )[0][0]
         
@@ -314,7 +320,7 @@ async def get_overview(
             return round(((current - previous) / previous) * 100, 1)
         
         clicks_growth = calc_growth(clicks_this_week, clicks_last_week)
-        visitors_growth = calc_growth(unique_visitors, unique_visitors_prev)
+        visitors_growth = calc_growth(unique_visitors_this_week, unique_visitors_last_week)
         today_growth = calc_growth(clicks_today, clicks_yesterday)
         
         return {
@@ -1079,9 +1085,13 @@ async def get_admin_overview(
             """SELECT count() FROM click_events
                WHERE date >= today() - 60 AND date < today() - 30"""
         )[0][0]
-        unique_visitors_prev = client.execute(
+        unique_visitors_this_week = client.execute(
             """SELECT uniqExact(ip_hash) FROM click_events
-               WHERE date >= today() - 60 AND date < today() - 30"""
+               WHERE date >= today() - 7"""
+        )[0][0]
+        unique_visitors_last_week = client.execute(
+            """SELECT uniqExact(ip_hash) FROM click_events
+               WHERE date >= today() - 14 AND date < today() - 7"""
         )[0][0]
         clicks_yesterday = client.execute(
             "SELECT count() FROM click_events WHERE date = today() - 1"
@@ -1099,7 +1109,7 @@ async def get_admin_overview(
             "clicks_this_week": clicks_this_week,
             "clicks_this_month": clicks_this_month,
             "clicks_growth": calc_growth(clicks_this_week, clicks_last_week),
-            "visitors_growth": calc_growth(unique_visitors, unique_visitors_prev),
+            "visitors_growth": calc_growth(unique_visitors_this_week, unique_visitors_last_week),
             "today_growth": calc_growth(clicks_today, clicks_yesterday),
         }
     except Exception as e:

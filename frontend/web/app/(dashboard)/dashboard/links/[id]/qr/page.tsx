@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { QRCodeSVG } from 'qrcode.react'
 import {
-  ArrowLeft, Download, RefreshCw, Loader2, Palette, Check
+  ArrowLeft, Download, RefreshCw, Loader2, Palette, Check, QrCode
 } from 'lucide-react'
 import { linksApi, qrApi } from '@/lib/api'
 
@@ -324,18 +324,34 @@ export default function QRCodePage() {
           <h2 className="mb-4 text-lg font-semibold">Saved QR Codes</h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {qrCodes.map((qr: any) => (
-              <div key={qr.id} className="rounded-lg border border-border p-4">
-                {qr.download_url && (
-                  <img
-                    src={qr.download_url}
-                    alt="QR Code"
-                    className="mb-2 w-full rounded"
-                  />
-                )}
+              <div key={qr.id} className="rounded-lg border border-border p-4 flex flex-col">
+                <div className="mb-2 flex aspect-square w-full min-h-[120px] items-center justify-center overflow-hidden rounded bg-muted/50">
+                  {qr.download_url ? (
+                    <img
+                      src={qr.download_url}
+                      alt="QR code preview"
+                      className="h-full w-full object-contain"
+                      onError={(e) => {
+                        const target = e.currentTarget
+                        target.style.display = 'none'
+                        const placeholder = target.nextElementSibling
+                        if (placeholder) (placeholder as HTMLElement).style.display = 'flex'
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className="hidden h-full w-full flex-col items-center justify-center gap-1 text-muted-foreground"
+                    style={{ display: qr.download_url ? 'none' : 'flex' }}
+                    aria-hidden
+                  >
+                    <QrCode className="h-10 w-10" />
+                    <span className="text-xs">Preview unavailable</span>
+                  </div>
+                </div>
                 <a
-                  href={qr.download_url}
-                  download
-                  className="text-sm font-medium text-primary hover:opacity-90"
+                  href={qr.download_url || '#'}
+                  download={qr.download_url ? true : undefined}
+                  className="text-sm font-medium text-primary hover:opacity-90 disabled:pointer-events-none disabled:opacity-50"
                 >
                   Download
                 </a>

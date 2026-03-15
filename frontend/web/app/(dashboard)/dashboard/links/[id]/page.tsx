@@ -32,6 +32,7 @@ export default function LinkDetailPage() {
   const queryClient = useQueryClient()
   const linkId = params.id as string
   const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState<string | null>(null)
   const [days, setDays] = useState(30)
 
   const { data: linkData, isLoading } = useQuery({
@@ -69,10 +70,15 @@ export default function LinkDetailPage() {
   const qrCodes = qrData?.data || []
 
   const handleCopy = async () => {
-    if (link) {
+    if (!link) return
+    setCopyError(null)
+    try {
       await copyToClipboard(link.short_url)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
+    } catch {
+      setCopyError('Copy failed. Try selecting the URL manually.')
+      setTimeout(() => setCopyError(null), 3000)
     }
   }
 
@@ -147,6 +153,7 @@ export default function LinkDetailPage() {
               </span>
               <div className="mt-1 flex flex-wrap items-center gap-2 sm:mt-0">
                 <button
+                  type="button"
                   onClick={handleCopy}
                   className="inline-flex items-center rounded-lg bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-200 hover:bg-slate-800"
                 >
@@ -162,6 +169,9 @@ export default function LinkDetailPage() {
                     </>
                   )}
                 </button>
+                {copyError && (
+                  <span className="text-xs text-amber-400">{copyError}</span>
+                )}
                 <a
                   href={link.short_url}
                   target="_blank"

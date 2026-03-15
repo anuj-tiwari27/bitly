@@ -34,7 +34,26 @@ export function formatDateTime(date: string | Date): string {
 }
 
 export function copyToClipboard(text: string): Promise<void> {
-  return navigator.clipboard.writeText(text)
+  if (typeof window === 'undefined') return Promise.reject(new Error('No window'))
+  if (navigator.clipboard?.writeText) {
+    return navigator.clipboard.writeText(text)
+  }
+  // Fallback for non-secure context or when clipboard API is denied
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.style.position = 'fixed'
+  textarea.style.left = '-9999px'
+  textarea.setAttribute('readonly', '')
+  document.body.appendChild(textarea)
+  textarea.select()
+  try {
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
+    return Promise.resolve()
+  } catch {
+    document.body.removeChild(textarea)
+    return Promise.reject(new Error('Copy failed'))
+  }
 }
 
 export function truncateUrl(url: string, maxLength: number = 50): string {
