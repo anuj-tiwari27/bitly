@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const { data: analyticsData } = useQuery({
     queryKey: ['analytics-overview'],
     queryFn: () => analyticsApi.overview(),
+    refetchInterval: 60_000, // refresh every 60s for more up-to-date stats
   })
 
   const links = linksData?.data?.items || []
@@ -22,12 +23,13 @@ export default function DashboardPage() {
     total_clicks: 0, 
     unique_visitors: 0, 
     clicks_today: 0,
-    clicks_growth: 0,
-    visitors_growth: 0,
-    today_growth: 0
+    clicks_growth: null as number | null,
+    visitors_growth: null as number | null,
+    today_growth: null as number | null
   }
 
-  const formatGrowth = (value: number) => {
+  const formatGrowth = (value: number | null | undefined) => {
+    if (value == null) return '—'
     if (value === 0) return '0%'
     const sign = value > 0 ? '+' : ''
     return `${sign}${value}%`
@@ -40,22 +42,22 @@ export default function DashboardPage() {
       name: 'Total Clicks',
       value: formatNumber(analytics.total_clicks),
       icon: MousePointerClick,
-      change: formatGrowth(analytics.clicks_growth || 0),
-      changeType: (analytics.clicks_growth || 0) >= 0 ? 'positive' : 'negative',
+      change: formatGrowth(analytics.clicks_growth),
+      changeType: analytics.clicks_growth == null ? 'neutral' : (analytics.clicks_growth >= 0 ? 'positive' : 'negative'),
     },
     {
       name: 'Unique Visitors',
       value: formatNumber(analytics.unique_visitors),
       icon: Users,
-      change: formatGrowth(analytics.visitors_growth || 0),
-      changeType: (analytics.visitors_growth || 0) >= 0 ? 'positive' : 'negative',
+      change: formatGrowth(analytics.visitors_growth),
+      changeType: analytics.visitors_growth == null ? 'neutral' : (analytics.visitors_growth >= 0 ? 'positive' : 'negative'),
     },
     {
       name: 'Clicks Today',
       value: formatNumber(analytics.clicks_today),
       icon: TrendingUp,
-      change: formatGrowth(analytics.today_growth || 0),
-      changeType: (analytics.today_growth || 0) >= 0 ? 'positive' : 'negative',
+      change: formatGrowth(analytics.today_growth),
+      changeType: analytics.today_growth == null ? 'neutral' : (analytics.today_growth >= 0 ? 'positive' : 'negative'),
     },
     {
       name: 'Active Links',

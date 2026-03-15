@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Shield, Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react'
 import { authApi } from '@/lib/api'
+import { Logo } from '../components/Logo'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -48,18 +49,9 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 py-12">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <Link
-            href="/admin"
-            className="flex items-center justify-center space-x-2 text-foreground"
-          >
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <Shield className="h-5 w-5 text-white" />
-            </div>
-            <div className="flex flex-col leading-tight text-left">
-              <span className="text-2xl font-bold text-foreground">The Little URL</span>
-              <span className="text-xs text-muted-foreground">Admin console</span>
-            </div>
-          </Link>
+          <div className="flex justify-center text-foreground">
+            <Logo variant="lg" href="/" tagline="Admin console" />
+          </div>
           <h2 className="mt-6 text-2xl font-bold text-foreground">
             Admin sign in
           </h2>

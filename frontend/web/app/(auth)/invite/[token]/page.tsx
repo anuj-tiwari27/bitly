@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { Link2, Loader2, Lock, Mail, User } from 'lucide-react'
 import { inviteApi } from '@/lib/api'
+import { Logo } from '../../../components/Logo'
 
 export default function InviteAcceptPage() {
   const router = useRouter()
@@ -104,17 +105,9 @@ export default function InviteAcceptPage() {
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
       <div className="glass-card w-full max-w-md space-y-8 rounded-2xl p-6">
         <div className="text-center">
-          <Link href="/" className="flex items-center justify-center space-x-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary">
-              <span className="text-sm font-semibold text-white">tl</span>
-            </div>
-            <div className="flex flex-col leading-tight text-left">
-              <span className="text-xl font-bold text-foreground">The Little URL</span>
-              <span className="text-xs text-muted-foreground">
-                Pixel transformation for links.
-              </span>
-            </div>
-          </Link>
+          <div className="flex justify-center">
+            <Logo variant="lg" href="/" />
+          </div>
           <h2 className="mt-6 text-2xl font-bold text-foreground">
             Join {invite.organization_id ? 'the organization' : 'The Little URL'}
           </h2>

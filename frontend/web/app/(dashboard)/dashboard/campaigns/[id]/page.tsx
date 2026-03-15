@@ -45,6 +45,7 @@ export default function CampaignDetailPage() {
     queryKey: ['campaign-analytics', campaignId, days],
     queryFn: () => analyticsApi.campaignAnalytics(campaignId, days),
     enabled: !!campaignId,
+    refetchInterval: 30_000, // refresh campaign analytics every 30s
   })
 
   const { data: linksRes, isLoading: linksLoading } = useQuery({

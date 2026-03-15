@@ -313,10 +313,10 @@ async def get_overview(
             {"user_id": user_id}
         )[0][0]
         
-        # Calculate growth percentages
+        # Calculate growth percentages (None when no previous period for comparison)
         def calc_growth(current, previous):
             if previous == 0:
-                return 100.0 if current > 0 else 0.0
+                return None  # no meaningful comparison; frontend shows "—"
             return round(((current - previous) / previous) * 100, 1)
         
         clicks_growth = calc_growth(clicks_this_week, clicks_last_week)
@@ -1099,7 +1099,7 @@ async def get_admin_overview(
 
         def calc_growth(current, previous):
             if previous == 0:
-                return 100.0 if current > 0 else 0.0
+                return None
             return round(((current - previous) / previous) * 100, 1)
 
         return {

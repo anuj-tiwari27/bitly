@@ -44,6 +44,7 @@ export default function LinkDetailPage() {
     queryKey: ['link-analytics', linkId, days],
     queryFn: () => analyticsApi.linkAnalytics(linkId, days),
     enabled: !!linkId,
+    refetchInterval: 30_000, // refresh analytics every 30s
   })
 
   const { data: qrData } = useQuery({
@@ -144,56 +145,52 @@ export default function LinkDetailPage() {
 
       {/* Link URL Card */}
       <div className="glass-card rounded-xl p-6 text-card-foreground">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex-1">
-            <p className="mb-1 text-sm text-muted-foreground">Short URL</p>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="break-all font-mono text-sm text-primary sm:text-base">
-                {link.short_url}
-              </span>
-              <div className="mt-1 flex flex-wrap items-center gap-2 sm:mt-0">
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="inline-flex items-center rounded-lg bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-200 hover:bg-slate-800"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="mr-1 h-4 w-4 text-emerald-400" />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="mr-1 h-4 w-4 text-slate-300" />
-                      Copy
-                    </>
-                  )}
-                </button>
-                {copyError && (
-                  <span className="text-xs text-amber-400">{copyError}</span>
-                )}
-                <a
-                  href={link.short_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-lg border border-border px-3 py-2 text-xs font-medium text-slate-200 hover:bg-muted"
-                >
-                  <ExternalLink className="mr-1 h-4 w-4" />
-                  Open
-                </a>
-              </div>
-            </div>
-          </div>
-          <span
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              link.is_active
-                ? 'bg-emerald-500/15 text-emerald-300'
-                : 'bg-muted text-muted-foreground'
-            }`}
-          >
-            {link.is_active ? 'Active' : 'Inactive'}
+        <p className="mb-2 text-sm text-muted-foreground">Short URL</p>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <span className="break-all font-mono text-sm text-primary sm:text-base">
+            {link.short_url}
           </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="inline-flex items-center rounded-lg bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-200 hover:bg-slate-800"
+            >
+              {copied ? (
+                <>
+                  <Check className="mr-1 h-4 w-4 text-emerald-400" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="mr-1 h-4 w-4 text-slate-300" />
+                  Copy
+                </>
+              )}
+            </button>
+            <a
+              href={link.short_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-lg border border-border px-3 py-2 text-xs font-medium text-slate-200 hover:bg-muted"
+            >
+              <ExternalLink className="mr-1 h-4 w-4" />
+              Open
+            </a>
+            <span
+              className={`shrink-0 px-3 py-1 rounded-full text-sm font-medium ${
+                link.is_active
+                  ? 'bg-emerald-500/15 text-emerald-300'
+                  : 'bg-muted text-muted-foreground'
+              }`}
+            >
+              {link.is_active ? 'Active' : 'Inactive'}
+            </span>
+          </div>
         </div>
+        {copyError && (
+          <span className="mt-1 block text-xs text-amber-400">{copyError}</span>
+        )}
         <div className="mt-4 border-t border-border pt-4">
           <p className="mb-1 text-sm text-muted-foreground">Destination</p>
           <a

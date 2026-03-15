@@ -1,24 +1,13 @@
 import Link from 'next/link'
 import { ArrowRight, QrCode, BarChart3 } from 'lucide-react'
+import { Logo } from './components/Logo'
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-slate-950 text-foreground">
       {/* Top nav */}
       <nav className="container mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-            <span className="text-xs font-semibold text-white">tl</span>
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="text-lg font-semibold text-white">
-              The Little URL
-            </span>
-            <span className="text-xs text-slate-400">
-              Data to destination.
-            </span>
-          </div>
-        </div>
+        <Logo variant="md" tagline="Data to destination." />
         <div className="flex items-center gap-4 text-sm">
           <Link href="/login" className="text-slate-300 hover:text-white">
             Login
@@ -85,27 +74,7 @@ export default function Home() {
             <div className="glass-card rounded-3xl p-7">
               <div className="mb-6 flex justify-center">
                 <div className="inline-flex items-center gap-4 rounded-2xl border border-slate-700/70 bg-slate-950/80 px-6 py-5">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-secondary">
-                    <div className="grid h-9 w-9 grid-cols-3 grid-rows-3 gap-0.5 rounded-lg border border-white/40 bg-slate-950/40 p-0.5">
-                      <span className="bg-primary rounded-[2px]" />
-                      <span className="bg-primary/80 rounded-[2px]" />
-                      <span className="bg-secondary rounded-[2px]" />
-                      <span className="bg-primary/40 rounded-[2px]" />
-                      <span className="bg-teal-200/60 rounded-[2px]" />
-                      <span className="bg-secondary/70 rounded-[2px]" />
-                      <span className="bg-primary/30 rounded-[2px]" />
-                      <span className="bg-primary/60 rounded-[2px]" />
-                      <span className="bg-secondary/90 rounded-[2px]" />
-                    </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-white">
-                      The Little URL
-                    </span>
-                    <span className="text-[11px] text-slate-400">
-                      From data to destination.
-                    </span>
-                  </div>
+                  <Logo variant="md" tagline="From data to destination." inline />
                 </div>
               </div>
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-teal-300">

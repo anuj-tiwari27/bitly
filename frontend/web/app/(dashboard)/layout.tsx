@@ -15,6 +15,7 @@ import {
   Shield,
   Building2,
 } from 'lucide-react'
+import { Logo } from '../components/Logo'
 import { authApi, organizationsApi } from '@/lib/api'
 
 const baseNavigation = [
@@ -124,19 +125,7 @@ export default function DashboardLayout({
         <div className="h-full flex flex-col">
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-slate-800">
-            <Link href="/dashboard" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <span className="text-xs font-semibold text-white">tl</span>
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="text-sm font-semibold text-white">
-                  The Little URL
-                </span>
-                <span className="text-[11px] text-slate-400">
-                  Pixel transformation for links.
-                </span>
-              </div>
-            </Link>
+            <Logo variant="sm" href="/dashboard" className="space-x-2" />
             <button
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden p-2 rounded-md text-slate-300 hover:bg-slate-800"

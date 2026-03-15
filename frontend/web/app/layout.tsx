@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: 'The Little URL – Pixel Transformation for Links & QR',
   description:
     'Condense long URLs into elegant, trackable short links and QR codes. The Little URL turns data into destination with real-time analytics.',
+  icons: {
+    icon: '/thelittleurl-logo.png',
+    apple: '/thelittleurl-logo.png',
+  },
 }
 
 export default function RootLayout({

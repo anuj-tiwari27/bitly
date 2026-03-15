@@ -46,7 +46,13 @@ export default function LinksPage() {
   const toggleActiveMutation = useMutation({
     mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
       linksApi.update(id, { is_active }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['links'] }),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['links'] })
+      queryClient.invalidateQueries({ queryKey: ['link', id] })
+      queryClient.invalidateQueries({ queryKey: ['link-analytics', id] })
+      queryClient.invalidateQueries({ queryKey: ['analytics-overview'] })
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] })
+    },
   })
 
   const allLinks = data?.data?.items || []

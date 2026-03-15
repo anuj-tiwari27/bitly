@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import {
-  Megaphone, Plus, Search, MoreHorizontal, Link2,
-  MousePointerClick, Trash2, Calendar
+  Megaphone, Plus, Search, Link2,
+  MousePointerClick, Trash2, Calendar, Pencil
 } from 'lucide-react'
 import { campaignsApi } from '@/lib/api'
 import { formatNumber, formatDate } from '@/lib/utils'
@@ -132,6 +132,13 @@ export default function CampaignsPage() {
                   {formatDate(campaign.created_at)}
                 </div>
                 <div className="flex items-center space-x-2">
+                  <Link
+                    href={`/dashboard/campaigns/${campaign.id}/edit`}
+                    className="inline-flex items-center rounded p-1 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                    title="Edit campaign"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Link>
                   <Link
                     href={`/dashboard/campaigns/${campaign.id}`}
                     className="text-xs font-medium text-primary hover:opacity-90"
