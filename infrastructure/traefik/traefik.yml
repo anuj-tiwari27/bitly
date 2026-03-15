@@ -8,6 +8,15 @@ entryPoints:
   websecure:
     address: ":443"
 
+# Let's Encrypt (ACME) - replace email with your real address
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: work.anujtiwari27@gmail.com
+      storage: /etc/traefik/certs/acme.json
+      httpChallenge:
+        entryPoint: web
+
 providers:
   file:
     directory: /etc/traefik

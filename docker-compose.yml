@@ -18,6 +18,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./infrastructure/traefik:/etc/traefik
+      - traefik_certs:/etc/traefik/certs
     networks:
       - bitly-network
     restart: unless-stopped
@@ -180,10 +181,9 @@ services:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - traefik.http.routers.myapp.rule=Host(thelittleurl.com, www.thelittleurl.com)
-      - traefik.http.routers.myapp.tls.certresolver=letsencrypt
       - "traefik.http.routers.rbac.rule=PathPrefix(`/api/auth`) || PathPrefix(`/api/users`) || PathPrefix(`/api/roles`)"
-      - "traefik.http.routers.rbac.entrypoints=web"
+      - "traefik.http.routers.rbac.entrypoints=web,websecure"
+      - "traefik.http.routers.rbac.tls.certresolver=letsencrypt"
       - "traefik.http.services.rbac.loadbalancer.server.port=8000"
     networks:
       - bitly-network
@@ -214,7 +214,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.links.rule=PathPrefix(`/api/links`)"
-      - "traefik.http.routers.links.entrypoints=web"
+      - "traefik.http.routers.links.entrypoints=web,websecure"
+      - "traefik.http.routers.links.tls.certresolver=letsencrypt"
       - "traefik.http.services.links.loadbalancer.server.port=8000"
     networks:
       - bitly-network
@@ -239,7 +240,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.campaigns.rule=PathPrefix(`/api/campaigns`)"
-      - "traefik.http.routers.campaigns.entrypoints=web"
+      - "traefik.http.routers.campaigns.entrypoints=web,websecure"
+      - "traefik.http.routers.campaigns.tls.certresolver=letsencrypt"
       - "traefik.http.services.campaigns.loadbalancer.server.port=8000"
     networks:
       - bitly-network
@@ -270,10 +272,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.qr.rule=PathPrefix(`/api/qr`)"
-      - "traefik.http.routers.qr.entrypoints=web"
+      - "traefik.http.routers.qr.entrypoints=web,websecure"
+      - "traefik.http.routers.qr.tls.certresolver=letsencrypt"
       - "traefik.http.services.qr.loadbalancer.server.port=8000"
       - "traefik.http.routers.qr-files.rule=PathPrefix(`/qr-files`)"
-      - "traefik.http.routers.qr-files.entrypoints=web"
+      - "traefik.http.routers.qr-files.entrypoints=web,websecure"
+      - "traefik.http.routers.qr-files.tls.certresolver=letsencrypt"
       - "traefik.http.routers.qr-files.priority=90"
       - "traefik.http.routers.qr-files.service=qr"
     networks:
@@ -302,7 +306,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.redirect.rule=PathPrefix(`/r/`)"
-      - "traefik.http.routers.redirect.entrypoints=web"
+      - "traefik.http.routers.redirect.entrypoints=web,websecure"
+      - "traefik.http.routers.redirect.tls.certresolver=letsencrypt"
       - "traefik.http.routers.redirect.priority=100"
       - "traefik.http.services.redirect.loadbalancer.server.port=8000"
     networks:
@@ -323,7 +328,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.events.rule=PathPrefix(`/api/events`)"
-      - "traefik.http.routers.events.entrypoints=web"
+      - "traefik.http.routers.events.entrypoints=web,websecure"
+      - "traefik.http.routers.events.tls.certresolver=letsencrypt"
       - "traefik.http.services.events.loadbalancer.server.port=8000"
     networks:
       - bitly-network
@@ -382,7 +388,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.analytics.rule=PathPrefix(`/api/analytics`)"
-      - "traefik.http.routers.analytics.entrypoints=web"
+      - "traefik.http.routers.analytics.entrypoints=web,websecure"
+      - "traefik.http.routers.analytics.tls.certresolver=letsencrypt"
       - "traefik.http.services.analytics.loadbalancer.server.port=8000"
     networks:
       - bitly-network
@@ -413,10 +420,7 @@ services:
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`thelittleurl.com`,`www.thelittleurl.com`)"
-      - "traefik.http.routers.frontend.entrypoints=web,websecure"
-      - "traefik.http.routers.frontend.priority=1"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      # Routing and TLS are defined in infrastructure/traefik/dynamic.yml
     networks:
       - bitly-network
     restart: unless-stopped
@@ -434,3 +438,4 @@ volumes:
   zookeeper_data:
   zookeeper_logs:
   kafka_data:
+  traefik_certs:
